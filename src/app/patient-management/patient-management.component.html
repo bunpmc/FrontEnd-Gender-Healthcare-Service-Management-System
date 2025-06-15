@@ -1,0 +1,11 @@
+<div>
+  <app-patient-table
+    [patients]="patients"
+    [totalPatients]="totalPatients"
+    [currentPage]="currentPage"
+    [itemsPerPage]="itemsPerPage"
+    (search)="onSearchEvent($event)"
+    (addPatient)="onAddPatient()"
+    (pageChange)="onPageChange($event)"
+  ></app-patient-table>
+</div>

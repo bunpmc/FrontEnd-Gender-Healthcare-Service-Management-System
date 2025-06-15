@@ -1,0 +1,4 @@
+<div class="">
+  <app-service-search-bar [categories]="categories" (filterChange)="applyFilters($event)"></app-service-search-bar>
+  <app-service-table [filteredServices]="filteredServices" [categories]="categories"></app-service-table>
+</div>

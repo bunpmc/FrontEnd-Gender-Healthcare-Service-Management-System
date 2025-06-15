@@ -1,0 +1,6 @@
+/* Ensure the layout takes full height */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+
