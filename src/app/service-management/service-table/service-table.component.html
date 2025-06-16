@@ -4,12 +4,8 @@
       <tr class="border-b border-gray-200 bg-gray-50">
         <th class="py-3 px-4 text-gray-600 font-semibold w-1/12">ID</th>
         <th class="py-3 px-4 text-gray-600 font-semibold w-2/12">Category</th>
-        <th class="py-3 px-4 text-gray-600 font-semibold w-2/12">
-          Service Name
-        </th>
-        <th class="py-3 px-4 text-gray-600 font-semibold w-3/12">
-          Description
-        </th>
+        <th class="py-3 px-4 text-gray-600 font-semibold w-2/12">Service Name</th>
+        <th class="py-3 px-4 text-gray-600 font-semibold w-3/12">Description</th>
         <th class="py-3 px-4 text-gray-600 font-semibold w-1/12">Cost</th>
         <th class="py-3 px-4 text-gray-600 font-semibold w-1/12">Duration</th>
         <th class="py-3 px-4 text-gray-600 font-semibold w-1/12">Active</th>
@@ -17,37 +13,24 @@
       </tr>
     </thead>
     <tbody>
-      <tr
-        *ngFor="let service of filteredServices"
-        class="border-b border-gray-200 hover:bg-gray-50"
-      >
+      <tr *ngFor="let service of filteredServices" class="border-b border-gray-200 hover:bg-gray-50">
         <td class="py-3 px-4">
-          <div class="text-sm text-gray-600 font-mono">
-            {{ service.service_id }}
-          </div>
+          <div class="text-sm text-gray-600 font-mono">{{ service.service_id }}</div>
         </td>
         <td class="py-3 px-4">
-          <div class="text-sm text-gray-600 font-mono">
-            {{ getCategoryName(service.category_id) }}
-          </div>
+          <div class="text-sm text-gray-600 font-mono">{{ getCategoryName(service.category_id) }}</div>
         </td>
         <td class="py-3 px-4">
           <div class="text-sm text-gray-600">{{ service.service_name }}</div>
         </td>
         <td class="py-3 px-4">
-          <div class="text-sm text-gray-600">
-            {{ service.service_description || "N/A" }}
-          </div>
+          <div class="text-sm text-gray-600">{{ service.service_description || "N/A" }}</div>
         </td>
         <td class="py-3 px-4">
-          <div class="text-sm text-gray-600">
-            ${{ service.service_cost.toFixed(2) }}
-          </div>
+          <div class="text-sm text-gray-600">${{ service.service_cost.toFixed(2) }}</div>
         </td>
         <td class="py-3 px-4">
-          <div class="text-sm text-gray-600">
-            {{ service.duration_minutes || "N/A" }} min
-          </div>
+          <div class="text-sm text-gray-600">{{ service.duration_minutes || "N/A" }} min</div>
         </td>
         <td class="py-3 px-4">
           <span
@@ -63,6 +46,7 @@
         <td class="py-3 px-4">
           <div class="flex space-x-3">
             <button
+              (click)="onViewService(service)"
               class="text-blue-500 hover:text-blue-700 focus:outline-none"
               title="View"
             >
@@ -88,6 +72,7 @@
               </svg>
             </button>
             <button
+              (click)="onEditService(service)"
               class="text-blue-500 hover:text-blue-700 focus:outline-none"
               title="Edit"
             >

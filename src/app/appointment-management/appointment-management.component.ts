@@ -6,8 +6,22 @@ import { SearchBarComponent } from './appointment-search-bar/appointment-search-
   selector: 'app-appointment-management',
   imports: [AppointmentTableComponent, SearchBarComponent],
   templateUrl: './appointment-management.component.html',
-  styleUrl: './appointment-management.component.css'
+  styleUrls: ['./appointment-management.component.css']
 })
 export class AppointmentManagementComponent {
+  filters = {
+    searchTerm: '',
+    selectedPatient: '',
+    selectedStatus: '',
+    selectedDate: ''
+  };
 
+  onFilterChange(filters: {
+    searchTerm: string;
+    selectedPatient: string;
+    selectedStatus: string;
+    selectedDate: string;
+  }) {
+    this.filters = filters;
+  }
 }

@@ -1,0 +1,45 @@
+<div class="bg-white p-3 border-2 shadow-sm rounded-lg mb-3">
+  <div class="flex flex-col sm:flex-row justify-between items-center space-y-1.5 sm:space-y-0 sm:space-x-3">
+    <!-- Search by name -->
+    <div class="w-full sm:w-64">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search by staff name..."
+        class="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-gray-600"
+      />
+    </div>
+    <div class="flex flex-col sm:flex-row space-y-1.5 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+      <!-- Filter by role -->
+      <select
+        [(ngModel)]="selectedRole"
+        (change)="onFilter()"
+        class="w-full sm:w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-gray-600"
+      >
+        <option value="">All Roles</option>
+        <option *ngFor="let role of roles" [value]="role.value">
+          {{ role.label }}
+        </option>
+      </select>
+      <!-- Filter by status -->
+      <select
+        [(ngModel)]="selectedStatus"
+        (change)="onFilter()"
+        class="w-full sm:w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-gray-600"
+      >
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="on_leave">On Leave</option>
+      </select>
+      <!-- Add new staff -->
+      <button
+        (click)="onAddStaff()"
+        class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+      >
+        + Add Staff
+      </button>
+    </div>
+  </div>
+</div>

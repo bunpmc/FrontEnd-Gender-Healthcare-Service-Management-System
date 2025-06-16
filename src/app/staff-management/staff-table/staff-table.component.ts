@@ -1,57 +1,54 @@
+import { Staff, Role } from './../../models/staff.interface';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-staff-table',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './staff-table.component.html',
-  styleUrl: './staff-table.component.css'
+  styleUrls: ['./staff-table.component.css'],
+  standalone: true
 })
 export class StaffTableComponent {
-  staffs = [
-    {
-      initials: 'JS',
-      name: 'John Smith',
-      id: '0001', // UUID giả lập cho staff_id
-      role: 'Doctor',
-      email: 'john.smith@email.com',
-      years_experience: 10, // Thêm để khớp với database
-      hiredDate: '2015-12-15', // Định dạng YYYY-MM-DD để khớp với hired_at
-      status: 'active', // Khớp với staff_status
-      available: true
-    },
-    {
-      initials: 'JS',
-      name: 'John Smith',
-      id: '0001', // UUID giả lập cho staff_id
-      role: 'Doctor',
-      email: 'john.smith@email.com',
-      years_experience: 10, // Thêm để khớp với database
-      hiredDate: '2015-12-15', // Định dạng YYYY-MM-DD để khớp với hired_at
-      status: 'active', // Khớp với staff_status
-      available: true
-    },
-    {
-      initials: 'JS',
-      name: 'John Smith',
-      id: '0001', // UUID giả lập cho staff_id
-      role: 'Doctor',
-      email: 'john.smith@email.com',
-      years_experience: 10, // Thêm để khớp với database
-      hiredDate: '2015-12-15', // Định dạng YYYY-MM-DD để khớp với hired_at
-      status: 'active', // Khớp với staff_status
-      available: true
-    },
-    {
-      initials: 'JS',
-      name: 'John Smith',
-      id: '0001', // UUID giả lập cho staff_id
-      role: 'Doctor',
-      email: 'john.smith@email.com',
-      years_experience: 10, // Thêm để khớp với database
-      hiredDate: '2015-12-15', // Định dạng YYYY-MM-DD để khớp với hired_at
-      status: 'active', // Khớp với staff_status
-      available: true
+  @Input() filteredStaff: Staff[] = [];
+  @Input() roles: Role[] = [];
+  @Input() page: number = 1;
+  @Input() pageSize: number = 10;
+  @Output() viewStaff = new EventEmitter<Staff>();
+  @Output() editStaff = new EventEmitter<Staff>();
+  @Output() pageChange = new EventEmitter<{ page: number; pageSize: number }>();
+
+  get paginatedStaff(): Staff[] {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.filteredStaff.slice(start, end);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredStaff.length / this.pageSize);
+  }
+
+  getRoleName(roleValue: string): string {
+    const role = this.roles.find(r => r.value === roleValue);
+    return role ? role.label : roleValue;
+  }
+
+  onViewStaff(staff: Staff) {
+    this.viewStaff.emit(staff);
+  }
+
+  onEditStaff(staff: Staff) {
+    this.editStaff.emit(staff);
+  }
+
+  onPageChange(newPage: number) {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.pageChange.emit({ page: newPage, pageSize: this.pageSize });
     }
-  ];
+  }
+
+  formatDate(date: string): string {
+    return date ? new Date(date).toLocaleDateString() : 'N/A';
+  }
 }

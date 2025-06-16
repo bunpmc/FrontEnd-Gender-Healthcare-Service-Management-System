@@ -1,7 +1,19 @@
-<div>
-  <app-staff-overview></app-staff-overview>
-  <div class="bg-white p-4 border-2 shadow-md rounded-b-lg rounded-xl">
-    <app-filter-bar></app-filter-bar>
-    <app-staff-table></app-staff-table>
+<div class="max-w-7xl mx-auto">
+  <div *ngIf="isLoading" class="text-center py-4">Loading...</div>
+  <div *ngIf="!isLoading">
+    <app-staff-search-bar
+      [roles]="roles"
+      (filterChange)="applyFilters($event)"
+      (addStaff)="onAddStaff()"
+    ></app-staff-search-bar>
+    <app-staff-table
+      [filteredStaff]="filteredStaff"
+      [roles]="roles"
+      [page]="page"
+      [pageSize]="pageSize"
+      (viewStaff)="onViewStaff($event)"
+      (editStaff)="onEditStaff($event)"
+      (pageChange)="onPageChange($event)"
+    ></app-staff-table>
   </div>
 </div>

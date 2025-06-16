@@ -1,4 +1,15 @@
-<div class="">
-  <app-service-search-bar [categories]="categories" (filterChange)="applyFilters($event)"></app-service-search-bar>
-  <app-service-table [filteredServices]="filteredServices" [categories]="categories"></app-service-table>
+<div>
+  <div *ngIf="isLoading" class="text-center py-4">Loading...</div>
+  <div *ngIf="!isLoading">
+    <app-service-search-bar
+      [categories]="categories"
+      (filterChange)="applyFilters($event)"
+    ></app-service-search-bar>
+    <app-service-table
+      [filteredServices]="filteredServices"
+      [categories]="categories"
+      (viewService)="onViewService($event)"
+      (editService)="onEditService($event)"
+    ></app-service-table>
+  </div>
 </div>

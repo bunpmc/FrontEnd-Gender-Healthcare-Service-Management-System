@@ -1,25 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-
-interface Patient {
-  id: string;
-  full_name: string;
-  phone?: string;
-  email?: string;
-  gender?: string;
-  dob?: string;
-  allergies?: object | null;
-  chronic_conditions?: object | null;
-  past_surgeries?: object | null;
-  vaccination_status?: object | null;
-  patient_status: string;
-  created_at?: string;
-}
+import { FormsModule } from '@angular/forms';
+import { Patient } from '../../models/patient.interface';
 
 @Component({
   selector: 'app-patient-table',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './patient-table.component.html',
   styleUrls: ['./patient-table.component.css']
 })
@@ -27,9 +14,11 @@ export class PatientTableComponent {
   @Input() patients: Patient[] = [];
   @Input() totalPatients: number = 0;
   @Input() currentPage: number = 1;
-  @Input() itemsPerPage: number = 10; // để test
+  @Input() itemsPerPage: number = 10;
+  @Input() searchQuery: string = ''; // Nhận searchQuery từ parent
   @Output() search = new EventEmitter<string>();
   @Output() addPatient = new EventEmitter<void>();
+  @Output() pageChange = new EventEmitter<number>();
 
   get paginatedPatients(): Patient[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -48,36 +37,38 @@ export class PatientTableComponent {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
-  @Output() pageChange = new EventEmitter<number>();
-
   goToNextPage() {
     const totalPages = Math.ceil((this.totalPatients || 0) / (this.itemsPerPage || 10));
     if (this.currentPage < totalPages) {
-      this.currentPage++;
-      this.pageChange.emit(this.currentPage);
+      this.pageChange.emit(this.currentPage + 1);
     }
   }
 
   goToPreviousPage() {
     if (this.currentPage > 1) {
-      this.currentPage--;
-      this.pageChange.emit(this.currentPage);
+      this.pageChange.emit(this.currentPage - 1);
     }
   }
 
   onPageClick(page: number) {
-    this.currentPage = page;
-    this.pageChange.emit(this.currentPage);
+    this.pageChange.emit(page);
   }
 
-  onSearchEvent(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target) {
-      this.search.emit(target.value);
-    }
+  onSearchEvent() {
+    this.search.emit(this.searchQuery); // Phát ra giá trị searchQuery hiện tại
+  }
+
+  clearSearch() {
+    this.search.emit(''); // Phát ra query rỗng để reset
   }
 
   onAddPatient() {
     this.addPatient.emit();
+  }
+
+  formatDate(date: string | undefined): string {
+    if (!date) return '—';
+    const parsed = new Date(date);
+    return isNaN(parsed.getTime()) ? '—' : parsed.toLocaleDateString('en-GB');
   }
 }

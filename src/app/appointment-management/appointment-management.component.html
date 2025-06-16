@@ -1,2 +1,4 @@
-<app-search-bar></app-search-bar>
-<app-appointment-table></app-appointment-table>
+<div class="bg-white p-4 border-2 shadow-md rounded-b-lg rounded-xl">
+  <app-search-bar (filterChange)="onFilterChange($event)"></app-search-bar>
+  <app-appointment-table [filters]="filters"></app-appointment-table>
+</div>

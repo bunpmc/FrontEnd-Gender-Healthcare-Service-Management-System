@@ -1,33 +1,35 @@
+import { Role } from './../../models/staff.interface';
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Category } from '../../models/category.interface';
+
 
 @Component({
-  selector: 'app-service-search-bar',
+  selector: 'app-staff-search-bar',
   imports: [CommonModule, FormsModule],
-  templateUrl: './service-search-bar.component.html',
-  styleUrls: ['./service-search-bar.component.css']
+  templateUrl: './staff-search-bar.component.html',
+  styleUrls: ['./staff-search-bar.component.css'],
+  standalone: true
 })
-export class ServiceSearchBarComponent implements OnInit, OnDestroy {
-  @Input() categories: Category[] = [];
+export class StaffSearchBarComponent implements OnInit, OnDestroy {
+  @Input() roles: Role[] = [];
   @Output() filterChange = new EventEmitter<{
     searchTerm: string;
-    selectedCategory: string;
+    selectedRole: string;
     selectedStatus: string;
   }>();
-  @Output() addService = new EventEmitter<void>();
+  @Output() addStaff = new EventEmitter<void>();
 
   searchTerm = '';
-  selectedCategory = '';
+  selectedRole = '';
   selectedStatus = '';
   private searchSubject = new Subject<string>();
 
   ngOnInit() {
     this.searchSubject.pipe(
-      debounceTime(300), // Wait 300ms after last keystroke
+      debounceTime(300),
       distinctUntilChanged()
     ).subscribe(() => this.emitFilters());
   }
@@ -44,16 +46,15 @@ export class ServiceSearchBarComponent implements OnInit, OnDestroy {
     this.emitFilters();
   }
 
-  onAddService() {
-    this.addService.emit();
+  onAddStaff() {
+    this.addStaff.emit();
   }
 
   private emitFilters() {
     this.filterChange.emit({
       searchTerm: this.searchTerm,
-      selectedCategory: this.selectedCategory,
+      selectedRole: this.selectedRole,
       selectedStatus: this.selectedStatus
     });
   }
 }
-

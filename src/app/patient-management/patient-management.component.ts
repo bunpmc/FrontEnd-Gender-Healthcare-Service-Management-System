@@ -1,77 +1,61 @@
-import { SupabaseService } from './../supabase.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PatientTableComponent } from './patient-table/patient-table.component';
-
+import { SupabaseService } from '../supabase.service';
+import { Patient } from '../models/patient.interface';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-patient-management',
   standalone: true,
-  imports: [PatientTableComponent],
+  imports: [PatientTableComponent, CommonModule],
   templateUrl: './patient-management.component.html',
   styleUrls: ['./patient-management.component.css']
 })
 export class PatientManagementComponent implements OnInit {
-  patients: any[] = [];
+  patients: Patient[] = [];
   totalPatients = 0;
   currentPage = 1;
   itemsPerPage = 10;
+  isLoading = false;
+  errorMessage: string | null = null;
+  searchQuery: string = ''; // Lưu trữ searchQuery trong parent
 
-  constructor(private router: Router, private SupabaseService: SupabaseService) { }
+  constructor(private router: Router, private SupabaseService: SupabaseService) {}
 
   async ngOnInit() {
     await this.loadPatients();
   }
 
-  onPageChange(newPage: number) {
-    this.currentPage = newPage;
-  }
-
-
   async loadPatients(query: string = '') {
+    this.isLoading = true;
+    this.errorMessage = null;
     try {
-      if (query.trim()) {
-        // Search với cùng một query cho tất cả các fields
-        this.patients = await this.SupabaseService.searchPatients(query, query, query);
-      } else {
-        // Load tất cả patients nếu không có query
-        this.patients = await this.SupabaseService.getAllPatients();
-      }
-      this.totalPatients = this.patients.length;
-      this.currentPage = 1;
+      const { patients, total } = query.trim()
+        ? await this.SupabaseService.searchPatients(query, query, query, this.currentPage, this.itemsPerPage)
+        : await this.SupabaseService.getPatients(this.currentPage, this.itemsPerPage);
+      this.patients = patients;
+      this.totalPatients = total;
     } catch (error) {
-      console.error('Lỗi khi tải danh sách bệnh nhân:', error);
+      this.errorMessage = 'Failed to load patients. Please try again.';
       this.patients = [];
       this.totalPatients = 0;
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  async onSearch(query: string) {
-    await this.loadPatients(query);
+  onPageChange(newPage: number) {
+    this.currentPage = newPage;
+    this.loadPatients(this.searchQuery); // Truyền searchQuery khi đổi trang
   }
 
-  async onSearchEvent(query: string) {
-    try {
-      await this.loadPatients(query);
-    } catch (error) {
-      console.error('Error searching patients:', error);
-    }
+  onSearchEvent(query: string) {
+    this.searchQuery = query; // Cập nhật searchQuery
+    this.loadPatients(query);
   }
 
-  async onAddPatient() {
-    // Ví dụ: tạo bệnh nhân với dữ liệu mẫu
-    try {
-      const newPatient = await this.SupabaseService.createPatient(
-        crypto.randomUUID(),
-        'New Patient',
-        { food: ['peanuts'] },
-        { conditions: ['diabetes'] },
-        { surgeries: ['appendectomy'] },
-        { vaccines: ['covid-19'] }
-      );
-      await this.loadPatients(); // Tải lại danh sách sau khi thêm
-    } catch (error) {
-      console.error('Lỗi thêm bệnh nhân:', error);
-    }
+  onAddPatient() {
+    this.router.navigate(['/add-patient']);
   }
 }

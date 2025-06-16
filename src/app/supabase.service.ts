@@ -1,7 +1,9 @@
+import { Patient } from './models/patient.interface';
 import { Injectable } from '@angular/core';
 import { supabase } from './supabase-client';
 import { from, Observable } from 'rxjs';
-
+import { Staff } from './models/staff.interface';
+import { Role } from './models/staff.interface';
 @Injectable({
   providedIn: 'root'
 })
@@ -102,23 +104,6 @@ export class SupabaseService {
     return data || [];
   }
 
-  // Tìm kiếm bệnh nhân theo tên, điện thoại, hoặc email
-  async searchPatients(fullName: string, phone: string, email: string) {
-    const { data, error } = await supabase
-      .rpc('search_patients_by_fields', {
-        full_name: fullName,
-        phone: phone,
-        email: email
-      });
-
-    if (error) {
-      console.error("Lỗi tìm kiếm bệnh nhân: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
   async searchPatientsGeneral(query: string) {
     const { data, error } = await supabase
       .rpc('search_patients_by_fields', {
@@ -136,60 +121,104 @@ export class SupabaseService {
   }
 
 
-  // Tạo bệnh nhân mới
+//#region // ============= PATIENT FUNCTIONS ============= //
+
+async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patient[]; total: number }> {
+    const start = (page - 1) * itemsPerPage;
+    const { data, count } = await supabase
+      .from('patients')
+      .select('*', { count: 'exact' })
+      .range(start, start + itemsPerPage - 1);
+    return { patients: data ?? [], total: count ?? 0 };
+  }
+
+  async getPatientsAppointment() {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('id, full_name')
+      .order('full_name', { ascending: true }); // Sắp xếp theo tên để dễ chọn
+    if (error) throw error;
+    return data || [];
+  }
+
+  async searchPatients(
+    fullName: string,
+    phone: string,
+    email: string,
+    page: number,
+    itemsPerPage: number
+  ): Promise<{ patients: Patient[]; total: number }> {
+    const start = (page - 1) * itemsPerPage;
+    const query = supabase
+      .from('patients')
+      .select('*', { count: 'exact' })
+      .or(`full_name.ilike.%${fullName}%,phone.ilike.%${phone}%,email.ilike.%${email}%`)
+      .range(start, start + itemsPerPage - 1);
+    const { data, count } = await query;
+    return { patients: data ?? [], total: count ?? 0 };
+  }
+
   async createPatient(
     id: string,
-    name: string,
-    allergies?: object,
-    chronic_conditions?: object,
-    past_surgeries?: object,
-    vaccination_status?: object,
-    patient_status: string = 'in_treatment'
-  ) {
+    fullName: string,
+    allergies: object | null,
+    chronicConditions: object | null,
+    pastSurgeries: object | null,
+    vaccinationStatus: object | null
+  ): Promise<Patient> {
     const { data, error } = await supabase
-      .rpc('create_patient', {
-        id,
-        name,
-        allergies,
-        chronic_conditions,
-        past_surgeries,
-        vaccination_status,
-        patient_status
-      });
-
-    if (error) {
-      console.error('Lỗi tạo bệnh nhân:', error.message);
-      throw error;
-    }
-
+      .from('patients')
+      .insert([
+        {
+          id,
+          full_name: fullName,
+          allergies,
+          chronic_conditions: chronicConditions,
+          past_surgeries: pastSurgeries,
+          vaccination_status: vaccinationStatus,
+          patient_status: 'Active'
+        }
+      ])
+      .select()
+      .single();
+    if (error) throw error;
     return data;
   }
 
+//#endregion
 
-  // ============= APPOINTMENT FUNCTIONS =============
-
+//#region // ============= APPOINTMENT FUNCTIONS ============= //
   // Lấy tất cả appointments
-  async getAllAppointments() {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
+
+  getAllAppointments() {
+  return supabase
+    .from('appointments')
+    .select(`
       *,
       patients (
-        id,
         full_name,
         phone,
         email
       )
-    `)
-      .order('created_at', { ascending: false });
+    `);
+}
 
-    if (error) {
-      console.error("Lỗi khi load tất cả appointments: ", error.message);
-      throw error;
-    }
-
-    return data || [];
+  async updateAppointmentStatus(appointmentId: string, status: string) {
+    const { error } = await supabase
+      .from('appointments')
+      .update({ appointment_status: status })
+      .eq('id', appointmentId);
+    if (error) throw error;
   }
+
+  async deleteAppointment(appointmentId: string) {
+    const { error } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', appointmentId);
+    if (error) throw error;
+  }
+
 
   // Lấy appointment theo ID
   async getAppointmentById(appointmentId: string) {
@@ -381,42 +410,6 @@ export class SupabaseService {
     return data;
   }
 
-  // Cập nhật trạng thái appointment
-  async updateAppointmentStatus(appointmentId: string, status: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .update({
-        appointment_status: status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('appointment_id', appointmentId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Lỗi cập nhật trạng thái appointment:', error.message);
-      throw error;
-    }
-
-    return data;
-  }
-
-  // Xóa appointment
-  async deleteAppointment(appointmentId: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .delete()
-      .eq('appointment_id', appointmentId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Lỗi xóa appointment:', error.message);
-      throw error;
-    }
-
-    return data;
-  }
 
   // Lấy appointments trong khoảng thời gian
   async getAppointmentsByDateRange(startDate: string, endDate: string) {
@@ -493,5 +486,26 @@ export class SupabaseService {
   async getCancelledAppointments() {
     return this.getAppointmentsByStatus('cancelled');
   }
+//#endregion
 
+//#region // ============= STAFF FUNCTIONS ============= //
+
+  async getStaffMembers(): Promise<Staff[]> {
+    const { data, error } = await supabase.from('staff_members').select('*');
+    if (error) throw error;
+    return data as Staff[];
+  }
+
+  async getStaffRoles(): Promise<Role[]> {
+    // Adjust this based on how staff_role_enum is stored (e.g., a table or hardcoded enum)
+    // Example: Fetch from a roles table or return static enum values
+    return [
+      { value: 'doctor', label: 'Doctor' },
+      { value: 'receptionist', label: 'Receptionist' },
+      { value: 'admin', label: 'Admin' }
+      // Add other roles as per staff_role_enum
+    ];
+  }
+
+//#endregion
 }
