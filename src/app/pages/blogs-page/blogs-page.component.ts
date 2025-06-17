@@ -63,6 +63,7 @@ export class BlogsPageComponent implements OnInit {
 
     this.userService.getBlogs().subscribe({
       next: (blogs: Blog[]) => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         // Debug: Log raw data to see actual structure
         console.log('Raw blogs data:', blogs);
         if (blogs.length > 0) {
@@ -90,7 +91,7 @@ export class BlogsPageComponent implements OnInit {
       id: blog.blog_id,
       title: blog.blog_title,
       desc: blog.excerpt,
-      img: blog.image_link || '/assets/images/default-blog.jpg', // fallback image
+      img: blog.image_link || '', // fallback image
       author: blog.doctor_details.full_name,
       createdAt: blog.created_at,
       tags: tagsArray,

@@ -46,7 +46,13 @@
           (ngModelChange)="selectSpecialty($event)"
         >
           @for (spec of specialties; track spec) {
-          <option [value]="spec">{{ spec }}</option>
+          <option [value]="spec">
+            {{
+              spec === "All"
+                ? "All Specialties"
+                : (spec.replaceAll("_", " ") | titlecase)
+            }}
+          </option>
           }
         </select>
 
@@ -56,7 +62,9 @@
           (ngModelChange)="selectGender($event)"
         >
           @for (g of genders; track g) {
-          <option [value]="g">{{ g === "All" ? "All Genders" : g }}</option>
+          <option [value]="g">
+            {{ g === "All" ? "All Genders" : (g | titlecase) }}
+          </option>
           }
         </select>
       </div>
@@ -101,7 +109,7 @@
               {{ doc.staff_members.full_name }}
             </h3>
             <p class="text-sm text-gray-200 capitalize mt-1">
-              {{ doc.speciality.replace("_", " ") }}
+              {{ doc.speciality.replaceAll("_", " ") | titlecase }}
             </p>
             <div class="flex gap-2 flex-wrap text-xs mt-3">
               <span
@@ -114,10 +122,10 @@
                     doc.staff_members.gender !== 'female'
                 }"
               >
-                {{ doc.staff_members.gender }}
+                {{ doc.staff_members.gender | titlecase }}
               </span>
               <span class="bg-white/20 px-3 py-1 rounded-full capitalize">
-                {{ doc.department.replace("_", " ") }}
+                {{ doc.department.replaceAll("_", " ") | titlecase }}
               </span>
             </div>
           </div>
@@ -156,7 +164,6 @@
         </svg>
         Prev
       </button>
-
       <!-- Page Numbers -->
       @for (i of pageArray; track i) {
       <button
@@ -169,7 +176,6 @@
         {{ i + 1 }}
       </button>
       }
-
       <!-- Next -->
       <button
         (click)="goToPage(page + 1)"

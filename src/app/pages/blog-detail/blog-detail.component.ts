@@ -32,12 +32,13 @@ export class BlogDetailComponent implements OnInit {
 
     this.userService.getBlogById(blogId).subscribe({
       next: (data) => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         if (!data.content) {
           this.error = 'Blog không có nội dung!';
           this.isLoading = false;
           return;
         }
-        this.blog = data as BlogDetail; // ép kiểu nếu chắc chắn đúng field
+        this.blog = data as BlogDetail;
         this.isLoading = false;
       },
       error: () => {

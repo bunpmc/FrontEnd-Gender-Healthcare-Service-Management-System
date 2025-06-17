@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DoctorDetail } from '../../models/doctor.model';
 import { UserService } from '../../Services/user.service';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -19,6 +19,7 @@ import { FormsModule } from '@angular/forms';
     DatePipe,
   ],
   templateUrl: './doctor-detail.component.html',
+  // styleUrl: './doctor-detail.component.css', // nếu cần css thì mở dòng này
 })
 export class DoctorDetailComponent implements OnInit {
   doctor = signal<DoctorDetail | null>(null);
@@ -27,11 +28,13 @@ export class DoctorDetailComponent implements OnInit {
   activeTab = 'about';
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private userService = inject(UserService);
 
   fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll lên đầu trang khi vào detail
     const doctor_id = this.route.snapshot.paramMap.get('id');
     if (!doctor_id) {
       this.errorMsg.set('Không tìm thấy bác sĩ');
@@ -56,12 +59,19 @@ export class DoctorDetailComponent implements OnInit {
     });
   }
 
-  // GETTERS
+  getImageUrl(link?: string | null): string {
+    if (!link) return this.fallbackImage;
+    return link.includes('//doctor')
+      ? link.replace('//doctor', '/doctor')
+      : link;
+  }
+  // --- GETTERS ---
   get doctorName(): string {
     return this.doctor()?.staff_members?.full_name || 'Dr. [unknown]';
   }
 
-  getImageUrl(link?: string | null): string {
+  get doctorAvatar(): string {
+    const link = this.doctor()?.staff_members?.image_link;
     if (!link) return this.fallbackImage;
     return link.includes('//doctor')
       ? link.replace('//doctor', '/doctor')
@@ -78,5 +88,28 @@ export class DoctorDetailComponent implements OnInit {
 
   get certificationList() {
     return this.doctor()?.certifications?.certifications ?? [];
+  }
+
+  get specialty(): string {
+    return this.doctor()?.speciality?.replaceAll('_', ' ') ?? '';
+  }
+
+  get licenseNo(): string {
+    return this.doctor()?.license_no ?? '';
+  }
+
+  get doctorBlogs() {
+    return this.doctor()?.blogs ?? [];
+  }
+
+  // --- UI/UX Handler ---
+  setTab(tab: string) {
+    this.activeTab = tab;
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Optionally scroll to top when tab changes
+  }
+
+  backToList() {
+    this.router.navigate(['/doctors']);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
   }
 }

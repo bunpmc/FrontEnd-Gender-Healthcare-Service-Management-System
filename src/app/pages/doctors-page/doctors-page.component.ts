@@ -4,71 +4,70 @@ import { UserService } from '../../Services/user.service';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { NgClass } from '@angular/common';
+import { NgClass, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-doctors-page',
   standalone: true,
-  imports: [RouterLink, HeaderComponent, FooterComponent, NgClass, FormsModule],
+  imports: [
+    RouterLink,
+    HeaderComponent,
+    FooterComponent,
+    NgClass,
+    FormsModule,
+    TitleCasePipe, // DÙNG PIPE CHUẨN
+  ],
   templateUrl: './doctors-page.component.html',
-  styleUrls: ['./doctors-page.component.css'], // optional nếu có CSS riêng
+  styleUrls: ['./doctors-page.component.css'],
 })
 export class DoctorsPageComponent implements OnInit {
-  // ===== STATE =====
-  doctors: Doctor[] = [];
+  allDoctors: Doctor[] = [];
   paginatedDoctors: Doctor[] = [];
   loading = false;
 
-  // ===== FILTERS =====
+  // Filter state
   searchValue: string = '';
   selectedSpecialty: string = 'All';
   selectedGender: string = 'All';
   specialties: string[] = ['All'];
-  genders: string[] = ['All', 'male', 'female'];
+  genders: string[] = ['All', 'male', 'female', 'other'];
 
-  // ===== PAGINATION =====
+  // Pagination state
   page = 1;
-  perPage = 3;
+  perPage = 6;
   maxPage = 1;
+
+  showFilter = false;
+  isDesktop: boolean = window.innerWidth >= 768;
 
   private userService = inject(UserService);
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.fetchDoctors();
   }
 
   fetchDoctors(): void {
     this.loading = true;
-
-    const name = this.searchValue;
-    const specialty =
-      this.selectedSpecialty === 'All' ? '' : this.selectedSpecialty;
-    const gender = this.selectedGender === 'All' ? '' : this.selectedGender;
-
-    this.userService.getDoctors(name, specialty, gender).subscribe({
+    this.userService.getDoctors('', '', '').subscribe({
       next: (data) => {
-        this.doctors = data;
+        this.allDoctors = data;
+        // get unique specialties
         const uniqueSpecialties = Array.from(
-          new Set(data.map((doc) => doc.speciality))
+          new Set(data.map((doc) => doc.speciality).filter(Boolean))
         );
         this.specialties = ['All', ...uniqueSpecialties];
-
         this.page = 1;
         this.updatePagination();
+        this.loading = false;
       },
       error: (err) => {
-        console.error('Failed to load doctors:', err);
         alert('Không thể tải danh sách bác sĩ');
-      },
-      complete: () => {
         this.loading = false;
       },
     });
   }
-
-  showFilter: boolean = false;
-  isDesktop: boolean = window.innerWidth >= 768;
 
   @HostListener('window:resize', [])
   onResize() {
@@ -76,42 +75,65 @@ export class DoctorsPageComponent implements OnInit {
   }
 
   fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
-
-  getImageUrl(link: string | null): string {
+  getImageUrl(link: string | null | undefined): string {
     if (!link) return this.fallbackImage;
     return link.includes('//doctor')
       ? link.replace('//doctor', '/doctor')
       : link;
   }
 
-  // ===== EVENT: Search by name =====
+  // FILTER HANDLERS
   onSearch(event: Event): void {
     this.searchValue = (event.target as HTMLInputElement).value.trim();
-    this.fetchDoctors();
+    this.page = 1;
+    this.updatePagination();
   }
 
-  // ===== EVENT: Select Specialty =====
   selectSpecialty(specialty: string): void {
     this.selectedSpecialty = specialty;
-    this.fetchDoctors();
+    this.page = 1;
+    this.updatePagination();
   }
 
-  // ===== EVENT: Select Gender =====
   selectGender(gender: string): void {
     this.selectedGender = gender;
-    this.fetchDoctors();
+    this.page = 1;
+    this.updatePagination();
   }
-  // ===== PAGINATION =====
+
+  // FILTER + PAGINATION
+  updatePagination(): void {
+    let filtered = this.allDoctors;
+
+    // Filter by specialty
+    if (this.selectedSpecialty !== 'All')
+      filtered = filtered.filter(
+        (doc) => doc.speciality === this.selectedSpecialty
+      );
+
+    // Filter by gender
+    if (this.selectedGender !== 'All')
+      filtered = filtered.filter(
+        (doc) => doc.staff_members?.gender === this.selectedGender
+      );
+
+    // Filter by search name
+    if (this.searchValue)
+      filtered = filtered.filter((doc) =>
+        doc.staff_members?.full_name
+          ?.toLowerCase()
+          .includes(this.searchValue.toLowerCase())
+      );
+
+    this.maxPage = Math.max(1, Math.ceil(filtered.length / this.perPage));
+    const start = (this.page - 1) * this.perPage;
+    this.paginatedDoctors = filtered.slice(start, start + this.perPage);
+  }
+
   goToPage(pg: number): void {
     if (pg < 1 || pg > this.maxPage) return;
     this.page = pg;
     this.updatePagination();
-  }
-
-  updatePagination(): void {
-    this.maxPage = Math.ceil(this.doctors.length / this.perPage);
-    const start = (this.page - 1) * this.perPage;
-    this.paginatedDoctors = this.doctors.slice(start, start + this.perPage);
   }
 
   get pageArray(): number[] {

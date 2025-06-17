@@ -36,48 +36,52 @@ interface BlogDisplay {
 })
 export class HomePageComponent implements OnInit {
   private userService = inject(UserService);
-  
+
   latestBlogs: BlogDisplay[] = [];
   isLoadingBlogs = false;
   blogError: string | null = null;
 
   ngOnInit() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loadLatestBlogs();
   }
 
   loadLatestBlogs() {
     this.isLoadingBlogs = true;
     this.blogError = null;
-    
+
     this.userService.getBlogs().subscribe({
       next: (blogs: Blog[]) => {
         // Map and get latest 2 blogs
-        const mappedBlogs = blogs.map(blog => this.mapBlogToDisplay(blog));
-        
+        const mappedBlogs = blogs.map((blog) => this.mapBlogToDisplay(blog));
+
         // Sort by creation date (newest first) and take first 2
         this.latestBlogs = mappedBlogs
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
           .slice(0, 2);
-        
+
         this.isLoadingBlogs = false;
       },
       error: (error) => {
         console.error('Error loading latest blogs:', error);
         this.blogError = 'Unable to load latest blogs. Please try again.';
         this.isLoadingBlogs = false;
-      }
+      },
     });
   }
 
   private mapBlogToDisplay(blog: Blog): BlogDisplay {
     // Safely extract tags array
     const tagsArray = this.extractTags(blog.blog_tags);
-    
+
     return {
       id: blog.blog_id,
       title: blog.blog_title,
       desc: this.truncateDescription(blog.excerpt, 150), // Truncate for homepage
-      img: blog.image_link || '/assets/images/default-blog.jpg',
+      img: blog.image_link || '',
       author: blog.doctor_details.full_name,
       createdAt: blog.created_at,
       tags: tagsArray,
@@ -87,23 +91,23 @@ export class HomePageComponent implements OnInit {
 
   private extractTags(blogTags: any): string[] {
     if (!blogTags) return [];
-    
+
     if (Array.isArray(blogTags.tags)) {
       return blogTags.tags;
     }
-    
+
     if (Array.isArray(blogTags)) {
       return blogTags;
     }
-    
+
     if (typeof blogTags === 'string') {
-      return blogTags.split(',').map(tag => tag.trim());
+      return blogTags.split(',').map((tag) => tag.trim());
     }
-    
+
     if (typeof blogTags.tags === 'string') {
       return blogTags.tags.split(',').map((tag: string) => tag.trim());
     }
-    
+
     return [];
   }
 
@@ -111,14 +115,14 @@ export class HomePageComponent implements OnInit {
     if (!Array.isArray(tags) || tags.length === 0) {
       return 'Community';
     }
-    
+
     const tagMap: { [key: string]: string } = {
-      'transgender': 'Gender Stories',
+      transgender: 'Gender Stories',
       'hormone therapy': 'Gender Stories',
       'mental health': 'Mental Health',
-      'community': 'Community',
-      'legal': 'Legal',
-      'education': 'Education',
+      community: 'Community',
+      legal: 'Legal',
+      education: 'Education',
     };
 
     for (const tag of tags) {
@@ -127,7 +131,7 @@ export class HomePageComponent implements OnInit {
         if (category) return category;
       }
     }
-    
+
     return 'Community';
   }
 
@@ -135,10 +139,5 @@ export class HomePageComponent implements OnInit {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + '...';
-  }
-
-  // Handle image loading errors
-  onImageError(event: any) {
-    event.target.src = '/assets/images/default-blog.jpg';
   }
 }
