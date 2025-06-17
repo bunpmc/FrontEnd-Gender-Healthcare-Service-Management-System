@@ -1,40 +1,34 @@
-import { Component } from '@angular/core';
-import { Routes } from '@angular/router';
-import { AppComponent } from './app.component';
-import { PatientManagementComponent } from './patient-management/patient-management.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { StaffManagementComponent } from './staff-management/staff-management.component';
-import { AppointmentManagementComponent } from './appointment-management/appointment-management.component';
-import { ServiceManagementComponent } from './service-management/service-management.component';
+import { RouterModule, Routes } from '@angular/router';
+import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
+
+import { HomePageComponent } from './pages/home-page/home-page.component';
+import { AppointmentPageComponent } from './pages/appointment-page/appointment-page.component';
+
+import { DoctorsPageComponent } from './pages/doctors-page/doctors-page.component';
+
+import { BlogsPageComponent } from './pages/blogs-page/blogs-page.component';
+import { DoctorDetailComponent } from './pages/doctor-detail/doctor-detail.component';
+import { BlogDetailComponent } from './pages/blog-detail/blog-detail.component';
+import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
-  {
-    path: 'dashboard',
-    component: DashboardComponent
-  },
-  {
-    path: 'patient',
-    component: PatientManagementComponent
-  },
-  {
-    path: 'staff',
-    component: StaffManagementComponent
-  },
-  {
-    path: 'appointment',
-    component: AppointmentManagementComponent
-  },
-  {
-    path: 'services',
-    component: ServiceManagementComponent
-  },
-  {
-    path: '',
-    redirectTo: '/dashboard',
-    pathMatch: 'full'
-  },
-  {
-    path: '**',
-    redirectTo: '/dashboard',
-  }
+  { path: '', component: HomePageComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'appointment', component: AppointmentPageComponent },
+  { path: 'doctor', component: DoctorsPageComponent },
+  { path: 'doctor/:id', component: DoctorDetailComponent },
+  { path: 'blog', component: BlogsPageComponent },
+  { path: 'blog/:id', component: BlogDetailComponent },
 ];
+@NgModule({
+  imports: [
+    RouterModule.forRoot(routes, {
+      scrollPositionRestoration: 'enabled', // <-- THẦN CHÚ!
+      anchorScrolling: 'enabled', // bonus: lướt tới #id nếu cần
+    }),
+  ],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
