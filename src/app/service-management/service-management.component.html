@@ -1,15 +1,314 @@
-<div>
-  <div *ngIf="isLoading" class="text-center py-4">Loading...</div>
-  <div *ngIf="!isLoading">
-    <app-service-search-bar
-      [categories]="categories"
-      (filterChange)="applyFilters($event)"
-    ></app-service-search-bar>
-    <app-service-table
-      [filteredServices]="filteredServices"
-      [categories]="categories"
-      (viewService)="onViewService($event)"
-      (editService)="onEditService($event)"
-    ></app-service-table>
+<div class="container mx-auto max-w-7xl">
+  <app-service-search-bar
+    [categories]="categories"
+    (filterChange)="applyFilters($event)"
+    (addService)="openAddServiceModal()"
+    class="mb-6"
+  ></app-service-search-bar>
+  <div *ngIf="isLoading" class="text-center py-4 text-gray-500">Loading...</div>
+  <app-service-table
+    *ngIf="!isLoading"
+    [filteredServices]="filteredServices"
+    [categories]="categories"
+    (viewService)="openViewServiceModal($event)"
+    (editService)="openEditServiceModal($event)"
+  ></app-service-table>
+
+  <!-- Add Service Modal -->
+  <div *ngIf="showAddModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+      <h2 class="text-2xl font-semibold mb-4">Add New Service</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Service Name *</label>
+          <input
+            [(ngModel)]="newService.service_name"
+            type="text"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            [class.border-red-500]="errors['service_name']"
+          />
+          <p *ngIf="errors['service_name']" class="text-red-500 text-sm mt-1">Service name is required</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Category *</label>
+          <select
+            [(ngModel)]="newService.category_id"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            [class.border-red-500]="errors['category_id']"
+          >
+            <option value="">Select Category</option>
+            <option *ngFor="let category of categories" [value]="category.category_id">
+              {{ category.category_name }}
+            </option>
+          </select>
+          <p *ngIf="errors['category_id']" class="text-red-500 text-sm mt-1">Category is required</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            [(ngModel)]="newService.service_description"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="4"
+          ></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Cost ($) *</label>
+          <input
+            [(ngModel)]="newService.service_cost"
+            type="number"
+            min="0"
+            step="0.01"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="errors['service_cost']"
+          />
+          <p *ngIf="errors['service_cost']" class="text-red-500 text-sm mt-1">Cost must be non-negative</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Duration (minutes) *</label>
+          <input
+            [(ngModel)]="newService.duration_minutes"
+            type="number"
+            min="1"
+            max="60"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="errors['duration_minutes']"
+          />
+          <p *ngIf="errors['duration_minutes']" class="text-red-500 text-sm mt-1">Duration must be between 1 and 60 minutes</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active</label>
+          <input
+            [(ngModel)]="newService.is_active"
+            type="checkbox"
+            class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Image Link</label>
+          <input
+            [(ngModel)]="newService.image_link"
+            type="text"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">JSON Description</label>
+          <textarea
+            [(ngModel)]="newService.description"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="4"
+            placeholder='{"key": "value"}'
+            (blur)="validateJson('description')"
+            [class.border-red-500]="errors['description']"
+          ></textarea>
+          <p *ngIf="errors['description']" class="text-red-500 text-sm mt-1">Invalid JSON format</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Overall</label>
+          <textarea
+            [(ngModel)]="newService.overall"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end space-x-2">
+        <button
+          (click)="closeAddServiceModal()"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="addService()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          [disabled]="hasErrors()"
+        >
+          Add Service
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Service Modal -->
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+      <h2 class="text-2xl font-semibold mb-4">Edit Service</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Service Name *</label>
+          <input
+            [(ngModel)]="selectedService.service_name"
+            type="text"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            [class.border-red-500]="errors['service_name']"
+          />
+          <p *ngIf="errors['service_name']" class="text-red-500 text-sm mt-1">Service name is required</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Category *</label>
+          <select
+            [(ngModel)]="selectedService.category_id"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+            [class.border-red-500]="errors['category_id']"
+          >
+            <option value="">Select Category</option>
+            <option *ngFor="let category of categories" [value]="category.category_id">
+              {{ category.category_name }}
+            </option>
+          </select>
+          <p *ngIf="errors['category_id']" class="text-red-500 text-sm mt-1">Category is required</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            [(ngModel)]="selectedService.service_description"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="4"
+          ></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Cost ($) *</label>
+          <input
+            [(ngModel)]="selectedService.service_cost"
+            type="number"
+            min="0"
+            step="0.01"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="errors['service_cost']"
+          />
+          <p *ngIf="errors['service_cost']" class="text-red-500 text-sm mt-1">Cost must be non-negative</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Duration (minutes) *</label>
+          <input
+            [(ngModel)]="selectedService.duration_minutes"
+            type="number"
+            min="1"
+            max="60"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="errors['duration_minutes']"
+          />
+          <p *ngIf="errors['duration_minutes']" class="text-red-500 text-sm mt-1">Duration must be between 1 and 60 minutes</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active</label>
+          <input
+            [(ngModel)]="selectedService.is_active"
+            type="checkbox"
+            class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Image Link</label>
+          <input
+            [(ngModel)]="selectedService.image_link"
+            type="text"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">JSON Description</label>
+          <textarea
+            [(ngModel)]="selectedService.description"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="4"
+            placeholder='{"key": "value"}'
+            (blur)="validateJson('description')"
+            [class.border-red-500]="errors['description']"
+          ></textarea>
+          <p *ngIf="errors['description']" class="text-red-500 text-sm mt-1">Invalid JSON format</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Overall</label>
+          <textarea
+            [(ngModel)]="selectedService.overall"
+            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end space-x-2">
+        <button
+          (click)="closeEditServiceModal()"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="updateService()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          [disabled]="hasErrors()"
+        >
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Service Modal -->
+  <div *ngIf="showViewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+      <h2 class="text-2xl font-semibold mb-4">Service Details</h2>
+      <table class="min-w-full bg-white">
+        <tbody>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">ID</td>
+            <td class="py-2 px-4">{{ selectedService.service_id }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Name</td>
+            <td class="py-2 px-4">{{ selectedService.service_name }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Category</td>
+            <td class="py-2 px-4">{{ getCategoryName(selectedService.category_id) }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Description</td>
+            <td class="py-2 px-4">{{ selectedService.service_description || 'N/A' }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Cost</td>
+            <td class="py-2 px-4">${{ selectedService.service_cost?.toFixed(2) || 'N/A' }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Duration</td>
+            <td class="py-2 px-4">{{ selectedService.duration_minutes || 'N/A' }} min</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Active</td>
+            <td class="py-2 px-4">{{ selectedService.is_active ? 'Yes' : 'No' }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Image</td>
+            <td class="py-2 px-4">
+              <a *ngIf="selectedService.image_link" [href]="selectedService.image_link" target="_blank" class="text-blue-600 hover:underline">View Image</a>
+              <span *ngIf="!selectedService.image_link">N/A</span>
+            </td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">JSON Description</td>
+            <td class="py-2 px-4">{{ selectedService.description ? (selectedService.description | json) : 'N/A' }}</td>
+          </tr>
+          <tr class="border-b">
+            <td class="py-2 px-4 font-medium text-gray-700">Overall</td>
+            <td class="py-2 px-4">{{ selectedService.overall || 'N/A' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="mt-6 flex justify-end">
+        <button
+          (click)="closeViewServiceModal()"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </div>

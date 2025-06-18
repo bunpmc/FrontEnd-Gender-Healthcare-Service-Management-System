@@ -4,6 +4,9 @@ import { supabase } from './supabase-client';
 import { from, Observable } from 'rxjs';
 import { Staff } from './models/staff.interface';
 import { Role } from './models/staff.interface';
+import { Service } from './models/service.interface';
+import { Category } from './models/category.interface';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,20 +62,6 @@ export class SupabaseService {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     return this.formatDate(yesterday);
-  }
-
-  // Lấy Dịch vụ
-  async getMedicalService() {
-    const { data, error } = await supabase
-      .from('medical_services') // 👈 tên bảng trong Supabase
-      .select('*');
-
-    if (error) {
-      console.error('Lỗi lấy dữ liệu:', error.message);
-      throw error;
-    }
-
-    return data;
   }
 
   // Lấy Loại Dịch vụ
@@ -561,4 +550,59 @@ export class SupabaseService {
     }
   }
   //#endregion
+
+//#region //#region // ============= SERVICE FUNCTIONS ============= //
+
+  async getMedicalService(): Promise<Service[]> {
+    const { data, error } = await supabase
+      .from('medical_services')
+      .select('*');
+    if (error) throw error;
+    return data as Service[];
+  }
+
+  async getServiceCategories(): Promise<Category[]> {
+    const { data, error } = await supabase
+      .from('service_categories')
+      .select('*');
+    if (error) throw error;
+    return data as Category[];
+  }
+
+  async addMedicalService(service: Service): Promise<void> {
+    const { error } = await supabase
+      .from('medical_services')
+      .insert([{
+        category_id: service.category_id,
+        service_name: service.service_name,
+        service_description: service.service_description,
+        service_cost: service.service_cost,
+        duration_minutes: service.duration_minutes,
+        is_active: service.is_active,
+        image_link: service.image_link,
+        description: service.description,
+        overall: service.overall
+      }]);
+    if (error) throw error;
+  }
+
+  async updateMedicalService(service: Service): Promise<void> {
+    const { error } = await supabase
+      .from('medical_services')
+      .update({
+        category_id: service.category_id,
+        service_name: service.service_name,
+        service_description: service.service_description,
+        service_cost: service.service_cost,
+        duration_minutes: service.duration_minutes,
+        is_active: service.is_active,
+        image_link: service.image_link,
+        description: service.description,
+        overall: service.overall
+      })
+      .eq('service_id', service.service_id);
+    if (error) throw error;
+  }
+
+//#endregion
 }
