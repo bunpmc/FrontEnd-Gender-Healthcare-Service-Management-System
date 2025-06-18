@@ -4,7 +4,7 @@ export interface Patient {
   phone?: string;
   email?: string;
   gender?: string;
-  dob?: string;
+  date_of_birth?: string;
   allergies?: object | null;
   chronic_conditions?: object | null;
   past_surgeries?: object | null;

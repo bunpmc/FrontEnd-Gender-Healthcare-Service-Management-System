@@ -121,9 +121,9 @@ export class SupabaseService {
   }
 
 
-//#region // ============= PATIENT FUNCTIONS ============= //
+  //#region // ============= PATIENT FUNCTIONS ============= //
 
-async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patient[]; total: number }> {
+  async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patient[]; total: number }> {
     const start = (page - 1) * itemsPerPage;
     const { data, count } = await supabase
       .from('patients')
@@ -185,15 +185,15 @@ async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patie
     return data;
   }
 
-//#endregion
+  //#endregion
 
-//#region // ============= APPOINTMENT FUNCTIONS ============= //
+  //#region // ============= APPOINTMENT FUNCTIONS ============= //
   // Lấy tất cả appointments
 
   getAllAppointments() {
-  return supabase
-    .from('appointments')
-    .select(`
+    return supabase
+      .from('appointments')
+      .select(`
       *,
       patients (
         full_name,
@@ -201,7 +201,7 @@ async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patie
         email
       )
     `);
-}
+  }
 
   async updateAppointmentStatus(appointmentId: string, status: string) {
     const { error } = await supabase
@@ -218,6 +218,12 @@ async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patie
       .eq('id', appointmentId);
     if (error) throw error;
   }
+
+  // async countAppointmentByStatus(status: string): Promise<string>  {
+  //   const { data, error } = await supabase.rpc('count_appointment_by_status', { target_status: status });
+  //   if (error) throw error;
+  //   return String(data || 0);
+  // }
 
 
   // Lấy appointment theo ID
@@ -486,9 +492,9 @@ async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patie
   async getCancelledAppointments() {
     return this.getAppointmentsByStatus('cancelled');
   }
-//#endregion
+  //#endregion
 
-//#region // ============= STAFF FUNCTIONS ============= //
+  //#region // ============= STAFF FUNCTIONS ============= //
 
   async getStaffMembers(): Promise<Staff[]> {
     const { data, error } = await supabase.from('staff_members').select('*');
@@ -507,5 +513,52 @@ async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patie
     ];
   }
 
-//#endregion
+  async updateStaffMember(staff: Staff): Promise<void> {
+    const { error } = await supabase
+      .from('staff_members')
+      .update({
+        full_name: staff.full_name,
+        working_email: staff.working_email,
+        role: staff.role,
+        years_experience: staff.years_experience,
+        hired_at: staff.hired_at,
+        is_available: staff.is_available,
+        staff_status: staff.staff_status,
+        gender: staff.gender,
+        languages: staff.languages,
+        image_link: staff.image_link,
+        updated_at: new Date().toISOString() // Update timestamp
+      })
+      .eq('staff_id', staff.staff_id);
+
+    if (error) {
+      console.error('Error updating staff member:', error);
+      throw error;
+    }
+  }
+
+  async addStaffMember(staff: Staff): Promise<void> {
+    const { error } = await supabase
+      .from('staff_members')
+      .insert({
+        staff_id: staff.staff_id,
+        full_name: staff.full_name,
+        working_email: staff.working_email,
+        role: staff.role,
+        years_experience: staff.years_experience,
+        hired_at: staff.hired_at,
+        is_available: staff.is_available,
+        staff_status: staff.staff_status,
+        gender: staff.gender,
+        languages: staff.languages,
+        image_link: staff.image_link,
+        created_at: staff.created_at,
+        updated_at: staff.updated_at
+      });
+      if (error) {
+      console.error('Error adding staff member:', error);
+      throw error;
+    }
+  }
+  //#endregion
 }

@@ -69,6 +69,6 @@ export class PatientTableComponent {
   formatDate(date: string | undefined): string {
     if (!date) return '—';
     const parsed = new Date(date);
-    return isNaN(parsed.getTime()) ? '—' : parsed.toLocaleDateString('en-GB');
+    return isNaN(parsed.getTime()) ? '—' : parsed.toLocaleDateString('vi-VN');
   }
 }
