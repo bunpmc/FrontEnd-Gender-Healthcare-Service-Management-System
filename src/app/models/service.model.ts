@@ -11,10 +11,14 @@ export interface ServiceDetail {
   duration: number;
   image_link: string;
 }
-export interface Service {
-  ervice_id: string;
-  service_name: string;
-  overall: string;
+export interface MedicalService {
+  id: string;
+  name: string;
+  excerpt: string | null;
   price: number;
-  image_link: string;
+  image_link: string | null;
+  service_categories: {
+    category_id: string;
+    category_name: string;
+  };
 }
