@@ -9,26 +9,7 @@ import {
 } from '../models/user.model';
 import { Doctor, DoctorDetail } from '../models/doctor.model';
 import { Observable } from 'rxjs';
-import { BlogDetail } from '../models/blog.model';
-
-// Thêm interface Blog mới
-export interface Blog {
-  content: any;
-  blog_id: string;
-  blog_title: string;
-  excerpt: string;
-  image_link?: string | null;
-  blog_tags: {
-    tags: string[];
-  };
-  blog_status: string;
-  created_at: string;
-  updated_at: string;
-  doctor_details: {
-    full_name: string;
-    image_link?: string | null;
-  };
-}
+import { Blog, BlogDetail } from '../models/blog.model';
 
 // ================== SERVICE DECORATOR ==================
 @Injectable({
@@ -77,7 +58,38 @@ export class UserService {
       headers: this.getHeaders(),
     });
   }
+  // ================== FORGOT PASSWORD (GỬI OTP) ==================
+  forgotPassword(phone: string): Observable<any> {
+    // Format lại số phone nếu bắt đầu bằng số 0
+    const formattedPhone = phone.startsWith('0')
+      ? '+84' + phone.slice(1)
+      : phone;
+    return this.http.post(
+      `${environment.apiEndpoint}/forgot-password`,
+      { phone: formattedPhone },
+      { headers: this.getHeaders() }
+    );
+  }
 
+  // ================== RESET PASSWORD (NHẬP OTP + MẬT KHẨU MỚI) ==================
+  resetPassword(
+    phone: string,
+    otp: string,
+    newPassword: string
+  ): Observable<any> {
+    const formattedPhone = phone.startsWith('0')
+      ? '+84' + phone.slice(1)
+      : phone;
+    return this.http.post(
+      `${environment.apiEndpoint}/reset-password`,
+      {
+        phone: formattedPhone,
+        otp,
+        password: newPassword,
+      },
+      { headers: this.getHeaders() }
+    );
+  }
   // =========== PROFILE ===========
   getUserProfile() {
     let token =

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DoctorDetail } from '../../models/doctor.model';
 import { UserService } from '../../Services/user.service';
@@ -6,6 +6,9 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { DatePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
+import { BreadcrumbService } from '../../Services/Breadcrumb.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-doctor-detail',
@@ -17,11 +20,12 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     RouterLink,
     DatePipe,
+    BreadcrumbsComponent,
   ],
   templateUrl: './doctor-detail.component.html',
-  // styleUrl: './doctor-detail.component.css', // nếu cần css thì mở dòng này
+  // styleUrl: './doctor-detail.component.css',
 })
-export class DoctorDetailComponent implements OnInit {
+export class DoctorDetailComponent implements OnInit, OnDestroy {
   doctor = signal<DoctorDetail | null>(null);
   loading = signal(true);
   errorMsg = signal('');
@@ -30,33 +34,53 @@ export class DoctorDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private userService = inject(UserService);
+  private breadcrumbService = inject(BreadcrumbService);
+
+  private doctorId: string | null = null;
+  private breadcrumbSub?: Subscription;
 
   fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
 
   ngOnInit(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll lên đầu trang khi vào detail
-    const doctor_id = this.route.snapshot.paramMap.get('id');
-    if (!doctor_id) {
-      this.errorMsg.set('Không tìm thấy bác sĩ');
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // scroll top khi vào page
+
+    this.doctorId = this.route.snapshot.paramMap.get('id');
+    if (!this.doctorId) {
+      this.errorMsg.set('Doctor not found');
       this.loading.set(false);
       return;
     }
-    this.fetchDoctor(doctor_id);
+    this.fetchDoctor(this.doctorId);
   }
 
   fetchDoctor(doctor_id: string): void {
     this.loading.set(true);
     this.errorMsg.set('');
+
     this.userService.getDoctorById(doctor_id).subscribe({
       next: (doctor) => {
         this.doctor.set(doctor);
         this.loading.set(false);
+
+        // Gắn label dynamic breadcrumb với đường dẫn chính xác
+        const breadcrumbPath = `/doctor/${doctor_id}`;
+        const label = doctor?.staff_members?.full_name || 'Doctor Detail';
+        this.breadcrumbService.setLabel(breadcrumbPath, label);
       },
-      error: (err) => {
-        this.errorMsg.set('Không thể tải dữ liệu bác sĩ');
+      error: () => {
+        this.errorMsg.set('Failed to load doctor data');
         this.loading.set(false);
       },
     });
+  }
+
+  ngOnDestroy() {
+    // Clear label khi rời trang detail
+    if (this.doctorId) {
+      const breadcrumbPath = `/doctor/${this.doctorId}`;
+      this.breadcrumbService.clearLabel(breadcrumbPath);
+    }
+    this.breadcrumbSub?.unsubscribe();
   }
 
   getImageUrl(link?: string | null): string {
@@ -65,6 +89,7 @@ export class DoctorDetailComponent implements OnInit {
       ? link.replace('//doctor', '/doctor')
       : link;
   }
+
   // --- GETTERS ---
   get doctorName(): string {
     return this.doctor()?.staff_members?.full_name || 'Dr. [unknown]';
@@ -102,14 +127,14 @@ export class DoctorDetailComponent implements OnInit {
     return this.doctor()?.blogs ?? [];
   }
 
-  // --- UI/UX Handler ---
+  // --- UI/UX Handlers ---
   setTab(tab: string) {
     this.activeTab = tab;
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Optionally scroll to top when tab changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   backToList() {
-    this.router.navigate(['/doctors']);
+    this.router.navigate(['/doctor']);
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
   }
 }

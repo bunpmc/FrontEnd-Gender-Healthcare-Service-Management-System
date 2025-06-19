@@ -1,10 +1,11 @@
 // ==================== IMPORTS ====================
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   afterNextRender,
   Component,
   DestroyRef,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -30,13 +31,14 @@ export class LoginComponent {
   isWrong = false;
   isSubmitting = false;
   errorMsg = '';
+  showForgotPassword = signal(false);
 
   // ==================== VIEWCHILD & DEPENDENCY INJECTION ====================
   private form = viewChild.required<NgForm>('form');
   private destroyRef = inject(DestroyRef);
   private userService = inject(UserService);
   private tokenService = inject(TokenService);
-  private router = inject(Router);
+  public router = inject(Router);
 
   // ==================== CONSTRUCTOR ====================
   constructor() {
@@ -81,6 +83,14 @@ export class LoginComponent {
   }
 
   // ==================== METHODS ====================
+  openForgotPassword(event: Event) {
+    event.preventDefault();
+    this.showForgotPassword.set(true);
+  }
+
+  closeForgotPassword() {
+    this.showForgotPassword.set(false);
+  }
   // Xử lý khi sai thì set lại error
   onInput() {
     this.isWrong = false;

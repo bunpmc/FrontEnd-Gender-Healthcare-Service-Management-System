@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-doctors-page',
@@ -16,7 +17,8 @@ import { FormsModule } from '@angular/forms';
     FooterComponent,
     NgClass,
     FormsModule,
-    TitleCasePipe, // DÙNG PIPE CHUẨN
+    TitleCasePipe,
+    BreadcrumbsComponent,
   ],
   templateUrl: './doctors-page.component.html',
   styleUrls: ['./doctors-page.component.css'],

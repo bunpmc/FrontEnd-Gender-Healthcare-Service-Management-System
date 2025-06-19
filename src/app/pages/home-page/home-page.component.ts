@@ -6,7 +6,8 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { SplideComponent } from '../../components/splide/splide.component';
 import { SupportChatComponent } from '../../components/support-chat/support-chat.component';
 import { UserService } from '../../Services/user.service'; // Adjust path as needed
-import { Blog } from '../../models/blog.model'; // Adjust path as needed
+import { Blog } from '../../models/blog.model';
+import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component'; // Adjust path as needed
 
 // Interface để map dữ liệu từ API sang format hiện tại
 interface BlogDisplay {

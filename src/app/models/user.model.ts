@@ -19,3 +19,12 @@ export interface ContactMessage {
   schedule: string;
   message: string;
 }
+
+export interface ForgotPasswordRequest {
+  phone: string;
+}
+export interface ResetPasswordRequest {
+  phone: string;
+  otp: string;
+  password: string;
+}

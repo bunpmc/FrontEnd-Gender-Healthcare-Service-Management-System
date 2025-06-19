@@ -1,5 +1,8 @@
 <app-header />
 <body class="w-full bg-[#f8f8f8] py-[3rem]">
+  <div class="max-w-7xl mx-auto px-6 pt-7 text-[#4E6688]">
+    <app-breadcrumbs />
+  </div>
   @defer (when !loading()) { @if (errorMsg(); as err) {
   <div class="text-center py-16 text-red-600">
     <p class="text-lg">{{ err }}</p>
