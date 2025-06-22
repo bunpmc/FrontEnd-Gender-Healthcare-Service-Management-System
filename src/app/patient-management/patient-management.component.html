@@ -1,0 +1,17 @@
+<div *ngIf="errorMessage" class="text-red-500 text-center py-2">
+  {{ errorMessage }}
+</div>
+<div *ngIf="isLoading" class="text-center py-4">
+  <span>Loading...</span>
+</div>
+<app-patient-table
+  *ngIf="!isLoading"
+  [patients]="patients"
+  [totalPatients]="totalPatients"
+  [currentPage]="currentPage"
+  [itemsPerPage]="itemsPerPage"
+  [searchQuery]="searchQuery"
+  (search)="onSearchEvent($event)"
+  (addPatient)="onAddPatient()"
+  (pageChange)="onPageChange($event)"
+></app-patient-table>

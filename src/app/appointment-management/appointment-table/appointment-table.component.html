@@ -1,0 +1,196 @@
+<div class="">
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="flex justify-center items-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <span class="ml-2 text-gray-600">Loading...</span>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+    {{ error }}
+    <button (click)="onRefresh()" class="ml-2 text-red-800 underline">Refresh</button>
+  </div>
+
+  <!-- Table -->
+  <table *ngIf="!loading && !error" class="table-fixed w-full text-xs text-left border border-gray-50">
+    <thead class="bg-gray-50 border-b border-gray-200">
+      <tr>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          ID
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Patient's Information
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Contact
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Visit type
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Schedule
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Status
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Created At
+        </th>
+        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Message
+        </th>
+        <th class="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Action
+        </th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <!-- No data message -->
+      <tr *ngIf="appointments.length === 0">
+        <td colspan="9" class="py-8 px-4 text-center text-gray-500">
+          No Appointment Data Available
+        </td>
+      </tr>
+
+      <!-- Data rows -->
+      <tr *ngFor="let appointment of appointments" class="hover:bg-gray-50 transition-colors">
+        <!-- ID Column -->
+        <td class="py-4 px-4">
+          <div class="text-sm font-mono text-gray-900 truncate">{{ appointment.appointment_id }}</div>
+        </td>
+
+        <!-- Patient Information -->
+        <td class="py-4 px-4">
+          <div class="flex items-center truncate">
+            <div class="">
+              <div class="text-sm font-medium text-gray-900">
+                {{ appointment.patient_name }}
+              </div>
+              <div class="text-sm text-gray-500">{{ appointment.patient_id }}</div>
+            </div>
+          </div>
+        </td>
+
+        <!-- Contact -->
+        <td class="py-4 px-4">
+          <div class="text-sm text-gray-900">
+            <div class="flex items-center mb-1">
+              {{ appointment.patient_phone }}
+            </div>
+            <div class="flex items-center">
+              <span class="truncate max-w-32">{{ appointment.patient_email }}</span>
+            </div>
+          </div>
+        </td>
+
+        <!-- Visit Type -->
+        <td class="py-4 px-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="getVisitTypeClass(appointment.visit_type)">
+            {{ getVisitTypeText(appointment.visit_type) }}
+          </span>
+        </td>
+
+        <!-- Schedule -->
+        <td class="py-4 px-4">
+          <div class="text-xs text-gray-900">
+            <div class="font-medium">{{ appointment.schedule_time_slot }}</div>
+            <!-- <div class="text-gray-500">{{ appointment.schedule_time_range }}</div> -->
+          </div>
+        </td>
+
+        <!-- Status -->
+        <td class="py-4 px-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="getStatusClass(appointment.status)">
+            <div class="w-2 h-2 rounded-full mr-1"
+                 [ngClass]="{
+                   'bg-yellow-400': appointment.status.toLowerCase() === 'pending',
+                   'bg-green-400': appointment.status.toLowerCase() === 'confirmed',
+                   'bg-blue-400': appointment.status.toLowerCase() === 'completed',
+                   'bg-red-400': appointment.status.toLowerCase() === 'cancelled'
+                 }"></div>
+            {{ getStatusText(appointment.status) }}
+          </span>
+        </td>
+
+        <!-- Created At -->
+        <td class="py-4 px-4">
+          <div class="text-sm text-gray-900">{{ formatDateTime(appointment.created_at).date }}</div>
+          <div class="text-sm text-gray-500">{{ formatDateTime(appointment.created_at).time }}</div>
+        </td>
+
+        <!-- Message -->
+        <td class="py-4 px-4">
+          <div class="max-w-32 truncate text-sm text-gray-600"
+               [title]="appointment.message">
+            {{ appointment.message }}
+          </div>
+        </td>
+
+        <!-- Actions -->
+        <td class="py-4 px-4">
+          <div class="flex items-center space-x-2">
+            <!-- View Detail Button -->
+            <button (click)="onViewDetail(appointment)"
+                    class="text-blue-600 hover:text-blue-800 transition-colors"
+                    title="Xem chi tiết">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+
+            <!-- Edit Button -->
+            <button (click)="onEdit(appointment)"
+                    class="text-green-600 hover:text-green-800 transition-colors"
+                    title="Chỉnh sửa">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+              </svg>
+            </button>
+
+            <!-- More Actions Dropdown -->
+            <div class="relative group">
+              <button class="text-gray-600 hover:text-gray-800 transition-colors" title="Thêm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 hidden group-hover:block">
+                <div class="py-1">
+                  <button *ngIf="appointment.status.toLowerCase() === 'pending'"
+                          (click)="onConfirm(appointment)"
+                          class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Confirm
+                  </button>
+                  <button *ngIf="appointment.status.toLowerCase() === 'confirmed'"
+                          (click)="onComplete(appointment)"
+                          class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Completed
+                  </button>
+                  <button *ngIf="appointment.status.toLowerCase() !== 'cancelled'"
+                          (click)="onCancel(appointment)"
+                          class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Cancelled
+                  </button>
+                  <hr class="my-1">
+                  <button (click)="onDelete(appointment)"
+                          class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,99 @@
+<aside class="w-64 bg-white shadow-md h-auto p-6 flex flex-col rounded-xl border-2">
+  <!-- Overview -->
+  <div class="text mb-2">Overview</div>
+  <ul>
+    <li
+      *ngFor="let item of overviewItems"
+      [class.bg-gray-100]="item.id === activeMenu"
+      class="mb-2"
+    >
+      <a
+        href="{{item.route}}"
+        (click)="setActiveMenu(item.id)"
+        class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+      >
+        <svg
+          class="w-6 h-6 mr-3"
+          [ngClass]="item.iconHover ? 'group-hover:text-gray-900' : ''"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            [attr.d]="item.iconPath"
+          />
+        </svg>
+        <span>{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Management -->
+  <div class="text mb-2">Management</div>
+  <ul>
+    <li
+      *ngFor="let item of managementItems"
+      [class.bg-gray-100]="item.id === activeMenu"
+      class="mb-2"
+    >
+      <a
+        href="{{item.route}}"
+        (click)="setActiveMenu(item.id)"
+        class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+      >
+        <svg
+          class="w-6 h-6 mr-3"
+          [ngClass]="item.iconHover ? 'group-hover:text-gray-900' : ''"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            [attr.d]="item.iconPath"
+          />
+        </svg>
+        <span>{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- System -->
+  <div class="text mb-2">System</div>
+  <ul class="border-t pt-2">
+    <li *ngFor="let item of settingItems" class="mb-2">
+      <a
+        href="#"
+        class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg group"
+      >
+        <svg
+          class="w-6 h-6 mr-3"
+          [ngClass]="
+            item.iconHover
+              ? 'group-hover:text-gray-900 group-hover:animate-spin'
+              : ''
+          "
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            [attr.d]="item.iconPath"
+          />
+        </svg>
+        <span>{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+</aside>

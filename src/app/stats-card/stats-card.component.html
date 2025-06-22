@@ -1,0 +1,97 @@
+<!-- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+  <div
+    *ngFor="let card of statsCards"
+    class="bg-white shadow-md rounded-xl p-4"
+  >
+
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-2x1 font-semibold text-gray-600">{{ card.title }}</h3>
+      <svg
+        class="w-5 h-5 text-gray-500"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          [attr.d]="card.iconPath"
+        />
+      </svg>
+    </div>
+
+    <div class="text-3xl font-bold text-gray-800">{{ card.value }}</div>
+    <div class="text-sm text-green-500 bol font-bold">{{ card.subtext }}</div>
+    <div *ngIf="card.alert" class="text-sm text-red-500">{{ card.alert }}</div>
+  </div>
+</div> -->
+
+
+
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+  @for (card of statsCards; track card.title) {
+    <div class="bg-white shadow-md rounded-xl p-4 relative flex flex-col h-full min-h-[140px]">
+      <!-- Loading Overlay -->
+      @if (card.loading) {
+        <div class="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center rounded-xl z-10">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+        </div>
+      }
+
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-2">
+      <h3 class="text-2x1 font-semibold text-gray-600">{{ card.title }}</h3>
+      <svg
+        class="w-5 h-5 text-gray-500"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          [attr.d]="card.iconPath"
+        />
+      </svg>
+    </div>
+
+      <!-- Data Section - grows to fill space -->
+      <div class="flex-1 flex flex-col justify-center">
+        <div class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2 leading-tight min-h-[32px] flex items-center">
+          {{ card.value }}
+        </div>
+      </div>
+
+      <!-- Footer Section - fixed at bottom -->
+      <div class="mt-auto">
+        <div
+          class="text-xs font-medium mb-1 leading-tight"
+          [class.text-green-500]="!card.subtext.includes('Error') && !card.loading"
+          [class.text-gray-400]="card.loading"
+          [class.text-red-500]="card.subtext.includes('Error')"
+        >
+          {{ card.subtext }}
+        </div>
+        @if (card.alert) {
+          <div class="text-xs text-red-500 font-medium leading-tight">
+            {{ card.alert }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Refresh Button (Optional) -->
+<!-- <div class="flex justify-end mb-4">
+  <button
+    (click)="refreshData()"
+    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+  >
+    Refresh Data
+  </button>
+</div> -->
