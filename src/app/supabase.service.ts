@@ -6,6 +6,9 @@ import { Staff } from './models/staff.interface';
 import { Role } from './models/staff.interface';
 import { Service } from './models/service.interface';
 import { Category } from './models/category.interface';
+import { exitCode } from 'node:process';
+import { Appointment, Guest, GuestAppointment } from './models/appointment.interface';
+import { ɵMetadataOverrider } from '@angular/core/testing';
 
 @Injectable({
   providedIn: 'root'
@@ -108,9 +111,144 @@ export class SupabaseService {
 
     return data || [];
   }
+  //#region DASHBOARD
 
+  // Thêm method này vào SupabaseService class
+
+  /**
+   * Lấy số lượng appointments có status pending
+   */
+  async getPendingAppointmentsCount(): Promise<number> {
+    try {
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('appointment_status', 'pending');
+
+      if (error) {
+        console.error('Error fetching pending appointments count:', error);
+        throw error;
+      }
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error in getPendingAppointmentsCount:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Lấy số lượng appointments pending cho ngày hôm nay
+   */
+  async getTodayPendingAppointmentsCount(): Promise<number> {
+    try {
+      const today = this.getTodayDate();
+
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('appointment_status', 'pending')
+        .eq('appointment_date', today);
+
+      if (error) {
+        console.error('Error fetching today pending appointments count:', error);
+        throw error;
+      }
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error in getTodayPendingAppointmentsCount:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Lấy số lượng appointments pending cho ngày mai (upcoming)
+   */
+  async getUpcomingPendingAppointmentsCount(): Promise<number> {
+    try {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('appointment_status', 'pending')
+        .gte('appointment_date', tomorrowStr);
+
+      if (error) {
+        console.error('Error fetching upcoming pending appointments count:', error);
+        throw error;
+      }
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error in getUpcomingPendingAppointmentsCount:', error);
+      throw error;
+    }
+  }
+
+  /*
+   * Lấy notifications
+  */
+  async getRecentNotifications(limit: number = 5): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select(`
+      notification_id,
+      notification_type,
+      sent_at,
+      appointment:appointments(
+        appointment_id,
+        created_at,
+        patient:patients(full_name)
+      )
+    `)
+      .eq('notification_type', 'new_appointment')
+      .order('sent_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching notifications:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  async getTodayAppointments(today: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+      appointment_id,
+      start_time,
+      status,
+      patient:patients(full_name)
+    `)
+      .gte('start_time', `${today}T00:00:00+00:00`)
+      .lte('start_time', `${today}T23:59:59+00:00`)
+      .order('start_time', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching today\'s appointments:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  //#endregion
 
   //#region // ============= PATIENT FUNCTIONS ============= //
+
+  async getPatients_Patient_Dashboard(): Promise<Patient[]> {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('*');
+    if (error) throw error;
+    return data ?? [];
+  }
 
   async getPatients(page: number, itemsPerPage: number): Promise<{ patients: Patient[]; total: number }> {
     const start = (page - 1) * itemsPerPage;
@@ -174,312 +312,46 @@ export class SupabaseService {
     return data;
   }
 
+  async updatePatient(patient: Patient): Promise<void> {
+    const { error } = await supabase
+      .from('patients')
+      .update(patient)
+      .eq('id', patient.id);
+    if (error) throw error;
+  }
   //#endregion
 
   //#region // ============= APPOINTMENT FUNCTIONS ============= //
-  // Lấy tất cả appointments
-
-  getAllAppointments() {
-    return supabase
+  async getAppointments(): Promise<Appointment[]> {
+    const { data, error } = await supabase
       .from('appointments')
-      .select(`
-      *,
-      patients (
-        full_name,
-        phone,
-        email
-      )
-    `);
-  }
-
-  async updateAppointmentStatus(appointmentId: string, status: string) {
-    const { error } = await supabase
-      .from('appointments')
-      .update({ appointment_status: status })
-      .eq('id', appointmentId);
+      .select('*');
     if (error) throw error;
+    return data ?? [];
   }
 
-  async deleteAppointment(appointmentId: string) {
-    const { error } = await supabase
-      .from('appointments')
-      .delete()
-      .eq('id', appointmentId);
+  async getGuestAppointments(): Promise<GuestAppointment[]> {
+    const { data, error } = await supabase
+      .from('guest_appointments')
+      .select('*');
     if (error) throw error;
+    return data ?? [];
   }
 
-  // async countAppointmentByStatus(status: string): Promise<string>  {
-  //   const { data, error } = await supabase.rpc('count_appointment_by_status', { target_status: status });
-  //   if (error) throw error;
-  //   return String(data || 0);
-  // }
-
-
-  // Lấy appointment theo ID
-  async getAppointmentById(appointmentId: string) {
+  async getPatientAppointment(): Promise<Patient[]> {
     const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-      *,
-      patients (
-        id,
-        full_name,
-        phone,
-        email,
-        date_of_birth,
-        gender
-      )
-    `)
-      .eq('appointment_id', appointmentId)
-      .single();
-
-    if (error) {
-      console.error("Lỗi khi load appointment: ", error.message);
-      throw error;
-    }
-
-    return data;
+      .from('patients')
+      .select('*');
+    if (error) throw error;
+    return data ?? [];
   }
 
-  // Lấy appointments theo patient_id
-  async getAppointmentsByPatientId(patientId: string) {
+  async getGuests(): Promise<Guest[]> {
     const { data, error } = await supabase
-      .from('appointments')
-      .select('*')
-      .eq('patient_id', patientId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Lỗi khi load appointments của bệnh nhân: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
-  // Lấy appointments theo trạng thái
-  async getAppointmentsByStatus(status: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-      *,
-      patients (
-        id,
-        full_name,
-        phone,
-        email
-      )
-    `)
-      .eq('appointment_status', status)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Lỗi khi load appointments theo trạng thái: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
-  // Lấy appointments theo loại visit
-  async getAppointmentsByVisitType(visitType: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-      *,
-      patients (
-        id,
-        full_name,
-        phone,
-        email
-      )
-    `)
-      .eq('visit_type', visitType)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Lỗi khi load appointments theo loại visit: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
-  // Lấy appointments theo schedule
-  async getAppointmentsBySchedule(schedule: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-      *,
-      patients (
-        id,
-        full_name,
-        phone,
-        email
-      )
-    `)
-      .eq('schedule', schedule)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Lỗi khi load appointments theo lịch: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
-  // Tìm kiếm appointments theo số điện thoại hoặc email
-  async searchAppointments(searchTerm: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-      *,
-      patients (
-        id,
-        full_name,
-        phone,
-        email
-      )
-    `)
-      .or(`phone.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Lỗi khi tìm kiếm appointments: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
-  // Tạo appointment mới
-  async createAppointment(appointmentData: {
-    patient_id?: string;
-    phone: string;
-    email: string;
-    visit_type: string;
-    schedule: string;
-    message?: string;
-    appointment_status?: string;
-  }) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .insert([appointmentData])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Lỗi tạo appointment:', error.message);
-      throw error;
-    }
-
-    return data;
-  }
-
-  // Cập nhật appointment
-  async updateAppointment(appointmentId: string, updateData: {
-    patient_id?: string;
-    phone?: string;
-    email?: string;
-    visit_type?: string;
-    schedule?: string;
-    message?: string;
-    appointment_status?: string;
-  }) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .update({
-        ...updateData,
-        updated_at: new Date().toISOString()
-      })
-      .eq('appointment_id', appointmentId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Lỗi cập nhật appointment:', error.message);
-      throw error;
-    }
-
-    return data;
-  }
-
-
-  // Lấy appointments trong khoảng thời gian
-  async getAppointmentsByDateRange(startDate: string, endDate: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-      *,
-      patients (
-        id,
-        full_name,
-        phone,
-        email
-      )
-    `)
-      .gte('created_at', startDate)
-      .lte('created_at', endDate)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Lỗi khi load appointments theo ngày: ", error.message);
-      throw error;
-    }
-
-    return data || [];
-  }
-
-  // Lấy appointments hôm nay
-  async getTodayAppointments() {
-    const today = this.getTodayDate();
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = this.formatDate(tomorrow);
-
-    return this.getAppointmentsByDateRange(today, tomorrowStr);
-  }
-
-  // Đếm số lượng appointments theo trạng thái
-  async countAppointmentsByStatus(): Promise<{ [key: string]: number }> {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select('appointment_status');
-
-    if (error) {
-      console.error("Lỗi khi đếm appointments: ", error.message);
-      throw error;
-    }
-
-    // Đếm theo trạng thái
-    const statusCount: { [key: string]: number } = {};
-    data?.forEach(appointment => {
-      const status = appointment.appointment_status || 'unknown';
-      statusCount[status] = (statusCount[status] || 0) + 1;
-    });
-
-    return statusCount;
-  }
-
-  // Lấy appointments pending (chờ xử lý)
-  async getPendingAppointments() {
-    return this.getAppointmentsByStatus('pending');
-  }
-
-  // Lấy appointments confirmed (đã xác nhận)
-  async getConfirmedAppointments() {
-    return this.getAppointmentsByStatus('confirmed');
-  }
-
-  // Lấy appointments completed (đã hoàn thành)
-  async getCompletedAppointments() {
-    return this.getAppointmentsByStatus('completed');
-  }
-
-  // Lấy appointments cancelled (đã hủy)
-  async getCancelledAppointments() {
-    return this.getAppointmentsByStatus('cancelled');
+      .from('guests')
+      .select('guest_id');
+    if (error) throw error;
+    return data ?? [];
   }
   //#endregion
 
@@ -544,14 +416,14 @@ export class SupabaseService {
         created_at: staff.created_at,
         updated_at: staff.updated_at
       });
-      if (error) {
+    if (error) {
       console.error('Error adding staff member:', error);
       throw error;
     }
   }
   //#endregion
 
-//#region //#region // ============= SERVICE FUNCTIONS ============= //
+  //#region //#region // ============= SERVICE FUNCTIONS ============= //
 
   async getMedicalService(): Promise<Service[]> {
     const { data, error } = await supabase
@@ -580,8 +452,7 @@ export class SupabaseService {
         duration_minutes: service.duration_minutes,
         is_active: service.is_active,
         image_link: service.image_link,
-        description: service.description,
-        overall: service.overall
+        excerpt: service.excerpt
       }]);
     if (error) throw error;
   }
@@ -597,12 +468,11 @@ export class SupabaseService {
         duration_minutes: service.duration_minutes,
         is_active: service.is_active,
         image_link: service.image_link,
-        description: service.description,
-        overall: service.overall
+        excerpt: service.excerpt
       })
       .eq('service_id', service.service_id);
     if (error) throw error;
   }
 
-//#endregion
+  //#endregion
 }

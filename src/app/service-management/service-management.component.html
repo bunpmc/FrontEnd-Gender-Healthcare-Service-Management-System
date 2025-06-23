@@ -1,4 +1,4 @@
-<div class="container mx-auto max-w-7xl">
+<div class="container mx-auto ax-w-7xl">
   <app-service-search-bar
     [categories]="categories"
     (filterChange)="applyFilters($event)"
@@ -8,11 +8,49 @@
   <div *ngIf="isLoading" class="text-center py-4 text-gray-500">Loading...</div>
   <app-service-table
     *ngIf="!isLoading"
-    [filteredServices]="filteredServices"
+    [paginatedServices]="paginatedServices"
     [categories]="categories"
     (viewService)="openViewServiceModal($event)"
     (editService)="openEditServiceModal($event)"
   ></app-service-table>
+  <div *ngIf="!isLoading && filteredServices.length > 0" class="flex justify-between items-center mt-4">
+    <div class="text-sm text-gray-700">
+      Page {{ currentPage }} of {{ totalPages }}
+    </div>
+    <div class="space-x-2">
+      <button
+        (click)="goToFirstPage()"
+        [disabled]="currentPage === 1"
+        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+      >
+        First
+      </button>
+      <button
+        (click)="goToPreviousPage()"
+        [disabled]="currentPage === 1"
+        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+      >
+        Previous
+      </button>
+      <button
+        (click)="goToNextPage()"
+        [disabled]="currentPage === totalPages"
+        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+      >
+        Next
+      </button>
+      <button
+        (click)="goToLastPage()"
+        [disabled]="currentPage === totalPages"
+        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+      >
+        Last
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!isLoading && filteredServices.length === 0" class="text-center py-4 text-gray-500">
+    No services found.
+  </div>
 
   <!-- Add Service Modal -->
   <div *ngIf="showAddModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
@@ -46,12 +84,27 @@
           <p *ngIf="errors['category_id']" class="text-red-500 text-sm mt-1">Category is required</p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            [(ngModel)]="newService.service_description"
-            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-            rows="4"
-          ></textarea>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <table class="min-w-full bg-white border">
+            <thead>
+              <tr>
+                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Field</th>
+                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let key of descriptionKeys">
+                <td class="py-2 px-4 border-b capitalize">{{ key }}</td>
+                <td class="py-2 px-4 border-b">
+                  <input
+                    [(ngModel)]="newServiceDescription[key]"
+                    type="text"
+                    class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Cost ($) *</label>
@@ -94,21 +147,9 @@
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">JSON Description</label>
+          <label class="block text-sm font-medium text-gray-700">Excerpt</label>
           <textarea
-            [(ngModel)]="newService.description"
-            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-            rows="4"
-            placeholder='{"key": "value"}'
-            (blur)="validateJson('description')"
-            [class.border-red-500]="errors['description']"
-          ></textarea>
-          <p *ngIf="errors['description']" class="text-red-500 text-sm mt-1">Invalid JSON format</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Overall</label>
-          <textarea
-            [(ngModel)]="newService.overall"
+            [(ngModel)]="newService.excerpt"
             class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
             rows="4"
           ></textarea>
@@ -164,12 +205,27 @@
           <p *ngIf="errors['category_id']" class="text-red-500 text-sm mt-1">Category is required</p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            [(ngModel)]="selectedService.service_description"
-            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-            rows="4"
-          ></textarea>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <table class="min-w-full bg-white border">
+            <thead>
+              <tr>
+                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Field</th>
+                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let key of descriptionKeys">
+                <td class="py-2 px-4 border-b capitalize">{{ key }}</td>
+                <td class="py-2 px-4 border-b">
+                  <input
+                    [(ngModel)]="selectedServiceDescription[key]"
+                    type="text"
+                    class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Cost ($) *</label>
@@ -212,21 +268,9 @@
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">JSON Description</label>
+          <label class="block text-sm font-medium text-gray-700">Excerpt</label>
           <textarea
-            [(ngModel)]="selectedService.description"
-            class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-            rows="4"
-            placeholder='{"key": "value"}'
-            (blur)="validateJson('description')"
-            [class.border-red-500]="errors['description']"
-          ></textarea>
-          <p *ngIf="errors['description']" class="text-red-500 text-sm mt-1">Invalid JSON format</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Overall</label>
-          <textarea
-            [(ngModel)]="selectedService.overall"
+            [(ngModel)]="selectedService.excerpt"
             class="mt-1 w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
             rows="4"
           ></textarea>
@@ -269,8 +313,23 @@
             <td class="py-2 px-4">{{ getCategoryName(selectedService.category_id) }}</td>
           </tr>
           <tr class="border-b">
-            <td class="py-2 px-4 font-medium text-gray-700">Description</td>
-            <td class="py-2 px-4">{{ selectedService.service_description || 'N/A' }}</td>
+            <td class="py-2 px-4 font-medium text-gray-700" colspan="2">
+              <div class="font-medium text-gray-700 mb-2">Description</div>
+              <table class="min-w-full bg-white border">
+                <thead>
+                  <tr>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700 w-1/3">Field</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700 w-2/3">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let key of descriptionKeys">
+                    <td class="py-2 px-4 border-b text-sm text-gray-700 capitalize">{{ key }}</td>
+                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ (selectedService.service_description && selectedService.service_description[key]) || 'N/A' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
           </tr>
           <tr class="border-b">
             <td class="py-2 px-4 font-medium text-gray-700">Cost</td>
@@ -292,12 +351,8 @@
             </td>
           </tr>
           <tr class="border-b">
-            <td class="py-2 px-4 font-medium text-gray-700">JSON Description</td>
-            <td class="py-2 px-4">{{ selectedService.description ? (selectedService.description | json) : 'N/A' }}</td>
-          </tr>
-          <tr class="border-b">
-            <td class="py-2 px-4 font-medium text-gray-700">Overall</td>
-            <td class="py-2 px-4">{{ selectedService.overall || 'N/A' }}</td>
+            <td class="py-2 px-4 font-medium text-gray-700">Excerpt</td>
+            <td class="py-2 px-4">{{ selectedService.excerpt || 'N/A' }}</td>
           </tr>
         </tbody>
       </table>

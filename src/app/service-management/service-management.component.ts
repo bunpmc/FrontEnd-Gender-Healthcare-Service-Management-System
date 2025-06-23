@@ -22,6 +22,7 @@ export class ServiceManagementComponent implements OnInit {
   showAddModal = false;
   showEditModal = false;
   showViewModal = false;
+  descriptionKeys: DescriptionKey[] = ['what', 'why', 'who', 'how'];
   newService: Service = {
     service_id: '',
     category_id: '',
@@ -31,23 +32,34 @@ export class ServiceManagementComponent implements OnInit {
     duration_minutes: null,
     is_active: true,
     image_link: null,
-    description: null,
-    overall: null
+    excerpt: null
   };
   selectedService: Service = { ...this.newService };
+  newServiceDescription: { [key in DescriptionKey]: string } = {
+    what: '',
+    why: '',
+    who: '',
+    how: ''
+  };
+  selectedServiceDescription: { [key in DescriptionKey]: string } = {
+    what: '',
+    why: '',
+    who: '',
+    how: ''
+  };
   errors: {
     service_name: boolean;
     category_id: boolean;
     service_cost: boolean;
     duration_minutes: boolean;
-    description: boolean;
   } = {
     service_name: false,
     category_id: false,
     service_cost: false,
-    duration_minutes: false,
-    description: false
+    duration_minutes: false
   };
+  currentPage: number = 1;
+  readonly pageSize: number = 10;
 
   constructor(private supabaseService: SupabaseService) {}
 
@@ -68,26 +80,42 @@ export class ServiceManagementComponent implements OnInit {
     }
   }
 
+  get paginatedServices(): Service[] {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.filteredServices.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredServices.length / this.pageSize);
+  }
+
+  goToFirstPage() {
+    this.currentPage = 1;
+  }
+
+  goToPreviousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  goToNextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  goToLastPage() {
+    this.currentPage = this.totalPages;
+  }
+
   applyFilters(filters: { searchTerm: string; selectedCategory: string; selectedStatus: string }) {
     this.filteredServices = this.services.filter(sv =>
       (!filters.searchTerm || sv.service_name.toLowerCase().includes(filters.searchTerm.toLowerCase())) &&
       (!filters.selectedCategory || sv.category_id === filters.selectedCategory) &&
       (!filters.selectedStatus || sv.is_active.toString() === filters.selectedStatus)
     );
-  }
-
-  validateJson(field: 'description') {
-    const value = field === 'description' ? this.newService.description : this.selectedService.description;
-    if (value) {
-      try {
-        JSON.parse(value);
-        this.errors[field] = false;
-      } catch (e) {
-        this.errors[field] = true;
-      }
-    } else {
-      this.errors[field] = false;
-    }
+    this.currentPage = 1; // Reset to first page on filter change
   }
 
   hasErrors(): boolean {
@@ -108,15 +136,19 @@ export class ServiceManagementComponent implements OnInit {
       duration_minutes: null,
       is_active: true,
       image_link: null,
-      description: null,
-      overall: null
+      excerpt: null
+    };
+    this.newServiceDescription = {
+      what: '',
+      why: '',
+      who: '',
+      how: ''
     };
     this.errors = {
       service_name: false,
       category_id: false,
       service_cost: false,
-      duration_minutes: false,
-      description: false
+      duration_minutes: false
     };
     this.showAddModal = true;
   }
@@ -127,8 +159,7 @@ export class ServiceManagementComponent implements OnInit {
       service_name: false,
       category_id: false,
       service_cost: false,
-      duration_minutes: false,
-      description: false
+      duration_minutes: false
     };
   }
 
@@ -137,10 +168,8 @@ export class ServiceManagementComponent implements OnInit {
       service_name: !this.newService.service_name,
       category_id: !this.newService.category_id,
       service_cost: this.newService.service_cost != null && this.newService.service_cost < 0,
-      duration_minutes: this.newService.duration_minutes != null && (this.newService.duration_minutes <= 0 || this.newService.duration_minutes > 60),
-      description: false
+      duration_minutes: this.newService.duration_minutes != null && (this.newService.duration_minutes <= 0 || this.newService.duration_minutes > 60)
     };
-    this.validateJson('description');
 
     if (this.hasErrors()) {
       return;
@@ -148,13 +177,17 @@ export class ServiceManagementComponent implements OnInit {
 
     try {
       this.isLoading = true;
-      const serviceToAdd = {
+      const serviceToAdd: Service = {
         ...this.newService,
-        description: this.newService.description ? JSON.parse(this.newService.description) : null
+        service_description: this.descriptionKeys.reduce((acc, key) => {
+          acc[key] = this.newServiceDescription[key] || null;
+          return acc;
+        }, {} as { [key in DescriptionKey]: string | null })
       };
       await this.supabaseService.addMedicalService(serviceToAdd);
       this.services = await this.supabaseService.getMedicalService();
       this.filteredServices = [...this.services];
+      this.currentPage = 1; // Reset to first page after adding
       this.closeAddServiceModal();
     } catch (error) {
       console.error('Error adding service:', error);
@@ -165,16 +198,18 @@ export class ServiceManagementComponent implements OnInit {
   }
 
   openEditServiceModal(service: Service) {
-    this.selectedService = {
-      ...service,
-      description: service.description ? JSON.stringify(service.description, null, 2) : null
+    this.selectedService = { ...service };
+    this.selectedServiceDescription = {
+      what: service.service_description?.what || '',
+      why: service.service_description?.why || '',
+      who: service.service_description?.who || '',
+      how: service.service_description?.how || ''
     };
     this.errors = {
       service_name: false,
       category_id: false,
       service_cost: false,
-      duration_minutes: false,
-      description: false
+      duration_minutes: false
     };
     this.showEditModal = true;
   }
@@ -185,8 +220,7 @@ export class ServiceManagementComponent implements OnInit {
       service_name: false,
       category_id: false,
       service_cost: false,
-      duration_minutes: false,
-      description: false
+      duration_minutes: false
     };
   }
 
@@ -195,10 +229,8 @@ export class ServiceManagementComponent implements OnInit {
       service_name: !this.selectedService.service_name,
       category_id: !this.selectedService.category_id,
       service_cost: this.selectedService.service_cost != null && this.selectedService.service_cost < 0,
-      duration_minutes: this.selectedService.duration_minutes != null && (this.selectedService.duration_minutes <= 0 || this.selectedService.duration_minutes > 60),
-      description: false
+      duration_minutes: this.selectedService.duration_minutes != null && (this.selectedService.duration_minutes <= 0 || this.selectedService.duration_minutes > 60)
     };
-    this.validateJson('description');
 
     if (this.hasErrors()) {
       return;
@@ -206,13 +238,17 @@ export class ServiceManagementComponent implements OnInit {
 
     try {
       this.isLoading = true;
-      const serviceToUpdate = {
+      const serviceToUpdate: Service = {
         ...this.selectedService,
-        description: this.selectedService.description ? JSON.parse(this.selectedService.description) : null
+        service_description: this.descriptionKeys.reduce((acc, key) => {
+          acc[key] = this.selectedServiceDescription[key] || null;
+          return acc;
+        }, {} as { [key in DescriptionKey]: string | null })
       };
       await this.supabaseService.updateMedicalService(serviceToUpdate);
       this.services = await this.supabaseService.getMedicalService();
       this.filteredServices = [...this.services];
+      this.currentPage = 1; // Reset to first page after updating
       this.closeEditServiceModal();
     } catch (error) {
       console.error('Error updating service:', error);
@@ -236,3 +272,5 @@ export class ServiceManagementComponent implements OnInit {
     return category ? category.category_name : 'Unknown';
   }
 }
+
+type DescriptionKey = 'what' | 'why' | 'who' | 'how';

@@ -1,0 +1,10 @@
+/* Optional styling for better appearance */
+input, select, button {
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #e0e0e0;
+}

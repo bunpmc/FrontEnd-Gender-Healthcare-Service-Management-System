@@ -11,9 +11,7 @@ import { PatientManagementComponent } from './patient-management/patient-managem
   imports: [RouterOutlet,
     CommonModule,
     HeaderComponent,
-    SidebarComponent,
-    PatientManagementComponent,
-    DashboardComponent],
+    SidebarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

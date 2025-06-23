@@ -1,0 +1,31 @@
+<div class="flex flex-col md:flex-row gap-4 mb-6 p-4 items-center bg-amber-50 rounded-xl">
+  <input
+    [(ngModel)]="searchQuery"
+    (input)="applyFilters()"
+    type="text"
+    placeholder="Search by full name"
+    class="w-full px-1 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+  />
+  <select
+    [(ngModel)]="genderFilter"
+    (change)="applyFilters()"
+    class="w-full px-1 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+  >
+    <option value="">All Genders</option>
+    <option *ngFor="let gender of genderOptions" [value]="gender">{{ gender | titlecase }}</option>
+  </select>
+  <select
+    [(ngModel)]="statusFilter"
+    (change)="applyFilters()"
+    class="w-full px-1 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+  >
+    <option value="">All Statuses</option>
+    <option *ngFor="let status of statusOptions" [value]="status">{{ status | titlecase }}</option>
+  </select>
+  <!-- <button
+    (click)="onAddPatient()"
+    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  >
+    Add Patient
+  </button> -->
+</div>

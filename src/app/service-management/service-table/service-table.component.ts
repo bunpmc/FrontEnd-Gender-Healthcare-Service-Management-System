@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Service } from '../../models/service.interface';
 import { Category } from '../../models/category.interface';
@@ -11,7 +11,7 @@ import { Category } from '../../models/category.interface';
   styleUrls: ['./service-table.component.css']
 })
 export class ServiceTableComponent {
-  @Input() filteredServices: Service[] = [];
+  @Input() paginatedServices: Service[] = [];
   @Input() categories: Category[] = [];
   @Output() viewService = new EventEmitter<Service>();
   @Output() editService = new EventEmitter<Service>();
@@ -19,13 +19,5 @@ export class ServiceTableComponent {
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(c => c.category_id === categoryId);
     return category ? category.category_name : 'Unknown';
-  }
-
-  onViewService(service: Service) {
-    this.viewService.emit(service);
-  }
-
-  onEditService(service: Service) {
-    this.editService.emit(service);
   }
 }
