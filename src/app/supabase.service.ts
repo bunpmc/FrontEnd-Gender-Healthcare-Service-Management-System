@@ -240,6 +240,112 @@ export class SupabaseService {
 
   //#endregion
 
+  //#region ANALYTIC
+
+
+// 🟦 KPI: Appointments Count
+ async getAppointmentsCount(start: string, end: string) {
+  const { count } = await supabase
+    .from('appointments')
+    .select('*', { count: 'exact', head: true })
+    .gte('created_at', start)
+    .lte('created_at', end);
+  return count || 0;
+}
+
+// 🟦 KPI: New Patients Count
+ async getNewPatientsCount(start: string, end: string) {
+  const { count } = await supabase
+    .from('patients')
+    .select('*', { count: 'exact', head: true })
+    .gte('created_at', start)
+    .lte('created_at', end);
+  return count || 0;
+}
+
+// 🟦 KPI: Revenue Sum
+ async getRevenueSum(start: string, end: string) {
+  const { data } = await supabase
+    .from('receipts')
+    .select('amount')
+    .gte('created_at', start)
+    .lte('created_at', end);
+  return data?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0;
+}
+
+// 🟦 KPI: Task Completion Ratio
+ async getTaskCompletionRatio(start: string, end: string) {
+  const { data } = await supabase
+    .from('appointments')
+    .select('appointment_status')
+    .gte('created_at', start)
+    .lte('created_at', end);
+
+  const completed = data?.filter(d => d.appointment_status === 'completed').length || 0;
+  const pending = data?.filter(d => d.appointment_status === 'pending').length || 0;
+  return completed + pending > 0 ? Math.round((completed / (completed + pending)) * 100) : 0;
+}
+
+// 🟩 CHART: Age Distribution
+ async getAgeDistribution() {
+  const { data } = await supabase.from('patients').select('date_of_birth');
+  const today = new Date();
+  const buckets = { '0–18': 0, '19–35': 0, '36–50': 0, '51+': 0 };
+
+  data?.forEach(p => {
+    const dob = new Date(p.date_of_birth);
+    const age = today.getFullYear() - dob.getFullYear();
+    if (age <= 18) buckets['0–18']++;
+    else if (age <= 35) buckets['19–35']++;
+    else if (age <= 50) buckets['36–50']++;
+    else buckets['51+']++;
+  });
+
+  return buckets;
+}
+
+// 🟩 CHART: Gender Distribution
+// async getGenderDistribution() {
+//   const { data } = await supabase.from('patients').select('gender');
+//   const genderMap = {};
+//   data?.forEach(p => {
+//     genderMap[p.gender] = (genderMap[p.gender] || 0) + 1;
+//   });
+//   return genderMap;
+// }
+
+// 🟩 CHART: Cancelled Rate
+async getCancelledRate(start: string, end: string) {
+  const { data } = await supabase
+    .from('appointments')
+    .select('appointment_status')
+    .gte('created_at', start)
+    .lte('created_at', end);
+
+  const cancelled = data?.filter(d => d.appointment_status === 'cancelled').length || 0;
+  return (cancelled / (data?.length || 1)) * 100;
+}
+
+// 🟩 CHART: Avg Appointment Duration (Mock)
+async getAvgAppointmentDuration() {
+  return 25; // you can replace this with real logic once you track actual duration
+}
+
+// 🟩 CHART: Staff Workload Balance
+async getStaffWorkloadBalance() {
+  const { data: doctors } = await supabase.from('staff_members').select('staff_id').eq('role', 'doctor');
+  const { data: appts } = await supabase.from('appointments').select('doctor_id');
+
+  const docCount = doctors?.length || 1;
+  const totalAppts = appts?.length || 0;
+  const perDoctor = Math.round(totalAppts / docCount);
+
+  return { doctorCount: docCount, totalAppointments: totalAppts, perDoctor };
+}
+
+
+  //#endregion
+
   //#region // ============= PATIENT FUNCTIONS ============= //
 
   async getPatients_Patient_Dashboard(): Promise<Patient[]> {

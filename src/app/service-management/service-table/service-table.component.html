@@ -1,75 +1,75 @@
-<div class="overflow-x-auto max-w-full">
-  <table class="w-full bg-white border text-sm table-fixed">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-24">
-          ID
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700">
-          Name
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700">
-          Category
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700">
-          Excerpt
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-20">
-          Cost
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-20">
-          Duration
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-16">
-          Active
-        </th>
-        <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-28">
-          Actions
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        *ngFor="let service of paginatedServices"
-        class="hover:bg-gray-50 h-10 align-middle"
-      >
-        <td
-          class="py-2 px-4 border-b truncate max-w-24"
-          title="{{ service.service_id }}"
+  <div class="overflow-x-auto max-w-full">
+    <table class="w-full bg-white border text-sm table-fixed">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-24">
+            ID
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700">
+            Name
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700">
+            Category
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700">
+            Excerpt
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-20">
+            Cost
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-20">
+            Duration
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-16">
+            Active
+          </th>
+          <th class="py-2 px-4 border-b text-left font-medium text-gray-700 w-28">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let service of paginatedServices"
+          class="hover:bg-gray-50 h-10 align-middle"
         >
-          {{ service.service_id }}
-        </td>
-        <td class="py-2 px-4 border-b truncate">{{ service.service_name }}</td>
-        <td class="py-2 px-4 border-b truncate">
-          {{ getCategoryName(service.category_id) }}
-        </td>
-        <td class="py-2 px-4 border-b truncate">
-          {{ service.excerpt || "N/A" }}
-        </td>
-        <td class="py-2 px-4 border-b truncate">
-          {{ service.service_cost?.toFixed(2) || "N/A" | currency : 'VND'}}
-        </td>
-        <td class="py-2 px-4 border-b truncate">
-          {{ service.duration_minutes || "N/A" }} min
-        </td>
-        <td class="py-2 px-4 border-b truncate">
-          {{ service.is_active ? "Yes" : "No" }}
-        </td>
-        <td class="py-2 px-4 border-b">
-          <button
-            (click)="viewService.emit(service)"
-            class="text-blue-600 hover:underline mr-2 text-xs"
+          <td
+            class="py-2 px-4 border-b truncate max-w-24"
+            title="{{ service.service_id }}"
           >
-            View
-          </button>
-          <button
-            (click)="editService.emit(service)"
-            class="text-green-600 hover:underline text-xs"
-          >
-            Edit
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            {{ service.service_id }}
+          </td>
+          <td class="py-2 px-4 border-b truncate">{{ service.service_name }}</td>
+          <td class="py-2 px-4 border-b truncate">
+            {{ getCategoryName(service.category_id) }}
+          </td>
+          <td class="py-2 px-4 border-b truncate">
+            {{ service.excerpt || "N/A" }}
+          </td>
+          <td class="py-2 px-4 border-b truncate">
+            {{ service.service_cost?.toFixed(2) || "N/A" | currency : 'VND'}}
+          </td>
+          <td class="py-2 px-4 border-b truncate">
+            {{ service.duration_minutes || "N/A" }} min
+          </td>
+          <td class="py-2 px-4 border-b truncate">
+            {{ service.is_active ? "Yes" : "No" }}
+          </td>
+          <td class="py-2 px-4 border-b">
+            <button
+              (click)="viewService.emit(service)"
+              class="text-blue-600 hover:underline mr-2 text-xs"
+            >
+              View
+            </button>
+            <button
+              (click)="editService.emit(service)"
+              class="text-green-600 hover:underline text-xs"
+            >
+              Edit
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

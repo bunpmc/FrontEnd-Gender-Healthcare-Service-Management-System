@@ -1,0 +1,22 @@
+<div class="grid grid-cols-2 gap-4">
+  <div>
+    <h2 class="font-semibold mb-2">Age Distribution</h2>
+    <pre>{{ ageDist | json }}</pre>
+  </div>
+  <div>
+    <h2 class="font-semibold mb-2">Gender Distribution</h2>
+    <pre>{{ genderDist | json }}</pre>
+  </div>
+  <div>
+    <h2 class="font-semibold mb-2">Cancelled Rate</h2>
+    <p>{{ cancelRate | number:'1.0-2' }}%</p>
+  </div>
+  <div>
+    <h2 class="font-semibold mb-2">Avg Appointment Duration</h2>
+    <p>{{ avgDuration }} minutes</p>
+  </div>
+  <div>
+    <h2 class="font-semibold mb-2">Staff Workload</h2>
+    <pre>{{ staffStats | json }}</pre>
+  </div>
+</div>
