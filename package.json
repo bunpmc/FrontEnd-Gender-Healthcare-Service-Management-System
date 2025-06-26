@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:Healthcare-Project": "node dist/healthcare-project/server/server.mjs",
-    "lint": "ng lint"
+    "lint": "eslint . -f @microsoft/eslint-formatter-sarif -o eslint-results.sarif"
   },
   "private": true,
   "dependencies": {
@@ -36,6 +36,7 @@
     "@angular-devkit/build-angular": "^19.2.14",
     "@angular/cli": "^19.2.14",
     "@angular/compiler-cli": "^19.2.0",
+    "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "@types/express": "^4.17.17",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.18.0",
