@@ -2,12 +2,21 @@ name: ESLint
 
 on:
   push:
+<<<<<<< eslint-1
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   schedule:
     - cron: '39 15 * * 4'
 
+=======
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "39 15 * * 4"
+    
+>>>>>>> eslint
 jobs:
   eslint:
     name: Run ESLint Scanning
