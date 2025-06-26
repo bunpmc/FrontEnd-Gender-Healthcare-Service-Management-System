@@ -10,7 +10,7 @@ on:
 
 jobs:
   eslint:
-    name: Run eslint scanning
+    name: Run ESLint Scanning
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,10 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install ESLint
+      - name: Install dependencies
         run: |
-          npm install
-          npm install eslint@8.10.0
+          npm ci
           npm install @microsoft/eslint-formatter-sarif@3.1.0
 
       - name: Run ESLint
@@ -32,13 +31,12 @@ jobs:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
         run: |
           npx eslint . \
-            --config .eslintrc.js \
-            --ext .js,.jsx,.ts,.tsx \
+            --ext .ts,.tsx,.js,.jsx \
             --format @microsoft/eslint-formatter-sarif \
             --output-file eslint-results.sarif
         continue-on-error: true
 
-      - name: Upload analysis results to GitHub
+      - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: eslint-results.sarif
