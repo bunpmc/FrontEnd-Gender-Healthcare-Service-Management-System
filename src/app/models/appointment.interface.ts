@@ -1,20 +1,43 @@
 export interface Appointment {
-  id: string;
   appointment_id: string;
-  patient_id: string;
-  doctor_id?: string; // Add if doctor_id is part of the appointments table
-  patient_name: string;
-  patient_phone: string;
-  patient_email: string;
+  patient_id: string | null;
+  doctor_id: string | null;
+  slot_id: string | null;
+  phone: string;
+  email: string;
   visit_type: string;
-  schedule_time_slot: string;
-  schedule_time_range: string;
-  status: string;
-  created_at: string;
-  message: string;
-  patients?: {
-    full_name: string;
-    phone: string;
-    email: string;
-  };
+  appointment_status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  schedule: string;
+}
+
+export interface GuestAppointment {
+  guest_appointment_id: string;
+  guest_id: string | null;
+  slot_id: string | null;
+  phone: string;
+  email: string;
+  visit_type: string;
+  appointment_status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  schedule: string;
+}
+
+export interface Guest {
+  guest_id: string;
+}
+
+export interface DisplayAppointment {
+  id: string;
+  type: 'patient' | 'guest';
+  name: string;
+  phone: string;
+  email: string;
+  visit_type: string;
+  appointment_status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  schedule: string;
 }

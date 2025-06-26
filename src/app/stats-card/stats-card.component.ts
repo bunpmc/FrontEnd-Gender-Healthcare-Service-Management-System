@@ -1,4 +1,3 @@
-
 import { error } from 'console';
 import { supabase } from './../supabase-client';
 import { SupabaseService } from './../supabase.service';
@@ -14,6 +13,7 @@ interface StatsCard {
   subtext: string;
   alert?: string;
   loading?: boolean;
+  priority?: 'normal' | 'high' | 'urgent';
 }
 
 @Component({
@@ -26,67 +26,85 @@ interface StatsCard {
 export class StatsCardComponent implements OnInit {
   statsCards: StatsCard[] = [
     {
-      title: "Today's Appointment",
+      title: "Today's Appointments",
       iconPath: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
       value: '-',
       subtext: 'Loading...',
-      loading: true
+      loading: true,
+      priority: 'normal'
     },
     {
       title: 'Total Patients',
       iconPath: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
       value: '-',
       subtext: 'Loading...',
-      loading: true
+      loading: true,
+      priority: 'normal'
     },
     {
       title: 'Revenue Today',
-      iconPath: 'M3 3v18h18M7 14l4-4 4 4 4-4',
+      iconPath: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1',
       value: '-',
       subtext: 'Loading...',
-      loading: true
+      loading: true,
+      priority: 'normal'
     },
     {
       title: 'Pending Tasks',
-      iconPath: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+      iconPath: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
       value: '-',
       subtext: 'Loading...',
-      loading: true
+      loading: true,
+      priority: 'normal'
     }
   ];
 
-  constructor(private SupabaseService : SupabaseService){}
+  lastUpdated: string = new Date().toLocaleTimeString('vi-VN');
+  isLoading: boolean = false;
+  hasCriticalAlertsAndNotLoading: boolean = false;
+
+  constructor(private SupabaseService: SupabaseService) { }
 
   ngOnInit(): void {
+    this.updateLastUpdated();
     this.loadStatsData();
   }
 
-  private loadStatsData() : void {
+  private loadStatsData(): void {
+    this.isLoading = true;
     const today = this.SupabaseService.getTodayDate();
     const yesterday = this.SupabaseService.getYesterdayDate();
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
+    const currentMonth = currentDate.getMonth() + 1;
 
     forkJoin({
-      todayAppointments : this.SupabaseService.getAppointmentCountByDay(today),
+      todayAppointments: this.SupabaseService.getAppointmentCountByDay(today),
       yesterdayAppointments: this.SupabaseService.getAppointmentCountByDay(yesterday),
       totalPatients: this.SupabaseService.getPatientCountByMonth(currentYear, currentMonth),
       todayRevenue: this.SupabaseService.getDailyRevenue(today),
       yesterdayRevenue: this.SupabaseService.getDailyRevenue(yesterday),
+      pendingTasks: this.SupabaseService.getPendingAppointmentsCount(),
+      todayPendingTasks: this.SupabaseService.getTodayPendingAppointmentsCount(),
     }).subscribe({
       next: (data) => {
         this.updateStatsCards(data);
+        this.isLoading = false;
+        this.hasCriticalAlertsAndNotLoading = this.hasCriticalAlerts;
+        this.updateLastUpdated();
       },
       error: (error) => {
         console.error('Error loading stats data:', error);
         this.handleError();
+        this.isLoading = false;
+        this.hasCriticalAlertsAndNotLoading = this.hasCriticalAlerts;
+        this.updateLastUpdated();
       }
     });
   }
 
-  private updateStatsCards(data : any): void{
-    // Cập nhật Today's Appointment
+  private updateStatsCards(data: any): void {
+    // Cập nhật Today's Appointments
     const appointmentChange = this.calculatePercentageChange(
       data.todayAppointments,
       data.yesterdayAppointments
@@ -95,17 +113,19 @@ export class StatsCardComponent implements OnInit {
     this.statsCards[0] = {
       ...this.statsCards[0],
       value: data.todayAppointments.toString(),
-      subtext: `${appointmentChange >= 0 ? '+' : '-'}${appointmentChange}%from yesterday`,
-      loading: false
+      subtext: `${appointmentChange >= 0 ? '+' : ''}${appointmentChange}% from yesterday`,
+      loading: false,
+      priority: data.todayAppointments > 10 ? 'high' : 'normal'
     };
 
     // Cập nhật Total Patients (theo tháng hiện tại)
     this.statsCards[1] = {
       ...this.statsCards[1],
       value: this.formatNumber(data.totalPatients),
-      subtext: 'This month',
-      loading: false
-    }
+      subtext: 'Registered this month',
+      loading: false,
+      priority: 'normal'
+    };
 
     // Cập nhật Revenue Today
     const revenueChange = this.calculatePercentageChange(
@@ -115,8 +135,33 @@ export class StatsCardComponent implements OnInit {
     this.statsCards[2] = {
       ...this.statsCards[2],
       value: this.formatCurrency(data.todayRevenue),
-      subtext: `${revenueChange >= 0 ? '+' : '-'}${revenueChange}% from yesterday`,
-      loading: false
+      subtext: `${revenueChange >= 0 ? '+' : ''}${revenueChange}% from yesterday`,
+      loading: false,
+      priority: data.todayRevenue < data.yesterdayRevenue ? 'high' : 'normal'
+    };
+
+    // Cập nhật Pending Tasks
+    const urgentThreshold = 5;
+    const highThreshold = 3;
+    let priority: 'normal' | 'high' | 'urgent' = 'normal';
+    let alert: string | undefined;
+
+    if (data.pendingTasks >= urgentThreshold) {
+      priority = 'urgent';
+      alert = `${data.pendingTasks} pending appointments need attention!`;
+    } else if (data.pendingTasks >= highThreshold) {
+      priority = 'high';
+    }
+
+    this.statsCards[3] = {
+      ...this.statsCards[3],
+      value: data.pendingTasks.toString(),
+      subtext: data.todayPendingTasks > 0
+        ? `${data.todayPendingTasks} due today`
+        : 'All caught up for today',
+      loading: false,
+      priority: priority,
+      alert: alert
     };
   }
 
@@ -125,11 +170,11 @@ export class StatsCardComponent implements OnInit {
     return Math.round(((current - previous) / previous) * 100);
   }
 
-  private formatNumber(num : number) : string {
+  private formatNumber(num: number): string {
     return num.toLocaleString();
   }
 
-  private formatCurrency(amount : number) : string {
+  private formatCurrency(amount: number): string {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
@@ -138,26 +183,39 @@ export class StatsCardComponent implements OnInit {
 
   private handleError(): void {
     this.statsCards.forEach((card, index) => {
-      if (index < 3 ){
-        this.statsCards[index] = {
-          ...card,
-          value: 'Error',
-          subtext: 'Failed to load',
-          loading: false
-        };
-      }
+      this.statsCards[index] = {
+        ...card,
+        value: 'Error',
+        subtext: 'Failed to load data',
+        loading: false,
+        priority: 'normal'
+      };
     });
   }
 
-  // Phương thức để refresh data
-  refreshData() : void {
-    this.statsCards.forEach((card, index) => {
-      if (index < 3) {
-        card.loading = true;
-        card.value = '-';
-        card.subtext = 'Loading....';
-      }
-    });
-    this.loadStatsData();
+  private updateLastUpdated(): void {
+    this.lastUpdated = new Date().toLocaleTimeString('vi-VN');
   }
+
+  // Phương thức để refresh data
+  refreshData(): void {
+  this.statsCards.forEach((card, index) => {
+    card.loading = true;
+    card.value = '-';
+    card.subtext = 'Loading...';
+    card.alert = undefined;
+    card.priority = 'normal';
+  });
+  this.isLoading = true;
+  this.loadStatsData();
+}
+
+  // Getter để check có pending tasks quan trọng không
+  get hasUrgentTasks(): boolean {
+    return this.statsCards[3]?.priority === 'urgent';
+  }
+
+  get hasCriticalAlerts(): boolean {
+  return this.statsCards.some(card => card.alert !== undefined);
+}
 }

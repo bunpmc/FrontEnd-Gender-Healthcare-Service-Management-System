@@ -1,68 +1,27 @@
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../supabase.service';
 
 @Component({
-  selector: 'app-search-bar',
+  selector: 'app-appointment-search-bar',
+  standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './appointment-search-bar.component.html',
-  styleUrls: ['./appointment-search-bar.component.css']
+  templateUrl: './appointment-search-bar.component.html'
 })
-export class SearchBarComponent implements OnInit {
-  @Output() filterChange = new EventEmitter<{
-    searchTerm: string;
-    selectedPatient: string;
-    selectedStatus: string;
-    selectedDate: string;
-  }>();
+export class AppointmentSearchBarComponent {
+  searchTerm: string = '';
+  visitType: string = '';
+  status: string = '';
+  visitTypeOptions: string[] = ['consultation', 'follow-up']; // Adjust based on visit_type_enum
+  statusOptions: string[] = ['pending', 'confirmed', 'cancelled']; // Adjust based on process_status
 
-  searchTerm = '';
-  selectedPatient = '';
-  selectedStatus = '';
-  selectedDate = '';
-  patients: { id: string; full_name: string }[] = [];
+  @Output() filterChange = new EventEmitter<{ searchTerm: string; visitType: string; status: string }>();
 
-  constructor(private supabaseService: SupabaseService) { }
-
-  async ngOnInit() {
-    await this.loadPatients();
-  }
-
-  async loadPatients() {
-    try {
-      this.patients = await this.supabaseService.getPatientsAppointment();
-    } catch (error) {
-      console.error('Error loading patients:', error);
-      this.patients = [];
-    }
-  }
-
-  onSearch() {
-    // Làm sạch searchTerm để tránh ký tự đặc biệt
-    this.searchTerm = this.searchTerm.replace(/[%_]/g, '\\$&').trim();
-    this.emitFilters();
-  }
-
-  onFilter() {
-    this.emitFilters();
-  }
-
-  resetFilters() {
-    this.searchTerm = '';
-    this.selectedPatient = '';
-    this.selectedStatus = '';
-    this.selectedDate = '';
-    this.emitFilters();
-  }
-
-  private emitFilters() {
+  applyFilters() {
     this.filterChange.emit({
       searchTerm: this.searchTerm,
-      selectedPatient: this.selectedPatient,
-      selectedStatus: this.selectedStatus,
-      selectedDate: this.selectedDate
+      visitType: this.visitType,
+      status: this.status
     });
   }
-
 }
