@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment - Gender Healthcare</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[#f9f9f9] min-h-screen font-poppins">
+    <!-- Header -->
+    <header class="bg-[#f4f4f4] border-b border-gray-200">
+      <div
+        class="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6 px-6 py-2 text-gray-600 text-sm"
+      >
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <div class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+              />
+            </svg>
+            <span class="font-medium select-all"
+              >Gendercare123&#64;gmail.com</span
+            >
+          </div>
+          <div class="flex items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-blue-600"
+              fill="none"
+              viewBox="0 0 27 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+              />
+            </svg>
+            <span class="font-medium select-all">+84 909 157 997</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="w-full sticky top-0 z-30 bg-white">
+      <div class="max-w-7xl mx-auto h-20 justify-center flex items-center">
+        <div class="h-12 w-48 flex items-center justify-center overflow-hidden">
+          <div class="text-2xl font-bold text-[#4e6688] font-poppins">
+            Gender Healthcare
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Progress Bar -->
+    <div class="relative w-full bg-white">
+      <div class="h-1 w-full bg-gray-200 rounded">
+        <div
+          class="h-1 bg-[#4e6688] rounded transition-all duration-500"
+          [style.width]="progressWidth"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-6">
+      <!-- Error/Success Messages -->
+      <div
+        *ngIf="errorMessage"
+        class="text-red-500 text-sm mb-4 text-center flex items-center justify-center gap-1"
+      >
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div
+        *ngIf="successMessage"
+        class="text-green-500 text-sm mb-4 text-center flex items-center justify-center gap-1"
+      >
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <!-- STEP 1: Choose booking type -->
+      <div *ngIf="currentStep === 1" class="step-content">
+        <h2
+          class="text-3xl font-extrabold text-[#4e6688] mb-8 tracking-tight font-poppins"
+        >
+          How would you like to book your appointment?
+        </h2>
+        <div class="space-y-6">
+          <button
+            type="button"
+            (click)="chooseBookingType('serfirst')"
+            class="booking-type-btn w-full bg-white border border-gray-200 rounded-xl p-6 flex justify-between group transition hover:border-[#4e6688]/80 focus:outline-none focus:ring-2 focus:ring-[#4e6688] focus:ring-offset-2"
+          >
+            <div class="w-[35rem]">
+              <div
+                class="text-xl font-semibold text-[#4e6688] mb-1 font-poppins w-full text-start"
+              >
+                Book by Service
+              </div>
+              <div class="text-gray-500 text-base w-full text-start">
+                Select the type of care you need — we'll match you with the
+                right provider.
+              </div>
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-6 h-6 text-[#4e6688] group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+            </div>
+          </button>
+          <button
+            type="button"
+            (click)="chooseBookingType('docfirst')"
+            class="booking-type-btn w-full bg-white border border-gray-200 rounded-xl p-6 flex justify-between items-center group transition hover:border-[#4e6688]/80 focus:outline-none focus:ring-2 focus:ring-[#4e6688] focus:ring-offset-2"
+          >
+            <div class="w-[35rem]">
+              <div
+                class="text-xl font-semibold text-[#4e6688] mb-1 font-poppins w-full text-start"
+              >
+                Book by Doctor
+              </div>
+              <div class="text-gray-500 text-base w-full text-start">
+                Pick your preferred doctor and see available times for a visit.
+              </div>
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-6 h-6 text-[#4e6688] group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Patient Information -->
+      <div *ngIf="currentStep === 2" class="step-content">
+        <form
+          #patientForm="ngForm"
+          (ngSubmit)="submitStep2(patientForm)"
+          class="max-w-7xl mx-auto py-8 space-y-8 text-[#4e6688]"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-extrabold text-[#4e6688] font-poppins">
+              Patient Information
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Full Name -->
+            <div>
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Full Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="booking.fullName"
+                name="fullName"
+                required
+                #fullName="ngModel"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-base font-medium outline-none bg-white transition"
+                [ngClass]="{
+                  'border-red-400': fullName.invalid && formSubmitted
+                }"
+                placeholder="Enter full name..."
+              />
+              <div
+                *ngIf="fullName.invalid && formSubmitted"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please enter your full name.
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Email (Optional)
+              </label>
+              <input
+                type="email"
+                [(ngModel)]="booking.email"
+                name="email"
+                #email="ngModel"
+                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-base font-medium outline-none bg-white transition"
+                [ngClass]="{ 'border-red-400': email.invalid && formSubmitted }"
+                placeholder="e.g. example@domain.com"
+              />
+              <div
+                *ngIf="email.invalid && formSubmitted"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please enter a valid email address.
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Phone Number <span class="text-red-500">*</span>
+              </label>
+              <div
+                class="flex rounded-lg border border-gray-200 focus-within:border-[#4e6688] focus-within:ring-1 focus-within:ring-[#4e6688] bg-white transition"
+                [ngClass]="{ 'border-red-400': phone.invalid && formSubmitted }"
+              >
+                <select
+                  [(ngModel)]="booking.phoneRegion"
+                  name="phoneRegion"
+                  (ngModelChange)="onPhoneRegionChange($event)"
+                  class="appearance-none bg-transparent border-0 pl-3 pr-8 py-3 text-base font-medium outline-none cursor-pointer min-w-[120px] rounded-l-lg"
+                >
+                  <option
+                    *ngFor="let region of phoneRegions"
+                    [value]="region.code"
+                  >
+                    {{ region.flag }} {{ region.dialCode }}
+                  </option>
+                </select>
+                <div class="w-px bg-gray-200"></div>
+                <input
+                  type="tel"
+                  [(ngModel)]="booking.phone"
+                  name="phone"
+                  required
+                  #phone="ngModel"
+                  (input)="formatPhoneNumber($event)"
+                  class="flex-1 px-4 py-3 border-0 rounded-r-lg text-base font-medium outline-none bg-transparent"
+                  [placeholder]="selectedPhoneRegion.placeholder"
+                />
+              </div>
+              <div
+                *ngIf="phone.invalid && formSubmitted"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please enter a valid phone number.
+              </div>
+            </div>
+
+            <!-- Gender -->
+            <div>
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Gender
+              </label>
+              <select
+                [(ngModel)]="booking.gender"
+                name="gender"
+                class="px-4 py-3 w-full rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-base font-medium outline-none bg-white transition min-w-[120px]"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <!-- Reason for Visit -->
+            <div class="md:col-span-2">
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Reason for Visit <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                [(ngModel)]="booking.message"
+                name="message"
+                required
+                #message="ngModel"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-base font-medium outline-none bg-white transition"
+                [ngClass]="{
+                  'border-red-400': message.invalid && formSubmitted
+                }"
+                placeholder="Describe the reason for your visit..."
+                rows="4"
+              ></textarea>
+              <div
+                *ngIf="message.invalid && formSubmitted"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please provide a reason for your visit.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="mt-10 flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200"
+          >
+            <button
+              type="button"
+              (click)="backStep2()"
+              class="flex items-center text-[#4e6688] font-semibold rounded-lg px-4 py-2 hover:bg-[#f3f8fa] transition focus:outline-none focus:ring-2 focus:ring-[#4e6688] focus:ring-offset-2"
+            >
+              <svg
+                class="w-6 h-6 mr-2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back
+            </button>
+            <button
+              type="submit"
+              class="bg-[#4e6688] text-white font-bold px-10 py-3 rounded-lg shadow hover:bg-[#98d2c0] hover:text-[#29374f] transition focus:outline-none focus:ring-2 focus:ring-[#4e6688] focus:ring-offset-2"
+            >
+              <span class="flex items-center gap-2">
+                CONTINUE
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- STEP 3: Service Selection (for Book by Service) -->
+      <div
+        *ngIf="currentStep === 3 && bookingType === 'serfirst'"
+        class="step-content"
+      >
+        <div class="max-w-7xl mx-auto py-8 space-y-8 text-[#4e6688]">
+          <h3 class="text-2xl font-extrabold text-[#4e6688] font-poppins">
+            Select Service
+          </h3>
+          <div class="mb-6">
+            <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+              Available Services <span class="text-red-500">*</span>
+            </label>
+            <div class="space-y-3">
+              <div
+                *ngFor="let service of services"
+                (click)="selectService(service)"
+                class="service-option bg-white border border-gray-200 rounded-lg p-4 cursor-pointer"
+                [ngClass]="{
+                  selected: booking.service_id === service.service_id
+                }"
+              >
+                <div class="text-lg font-semibold text-[#4e6688]">
+                  {{ service.name }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ service.description }}
+                </div>
+              </div>
+              <div *ngIf="services.length === 0" class="text-gray-500">
+                No services available.
+              </div>
+              <div
+                *ngIf="formSubmitted && !booking.service_id"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please select a service.
+              </div>
+            </div>
+          </div>
+          <div
+            class="mt-10 flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200"
+          >
+            <button
+              type="button"
+              (click)="backStep3()"
+              class="flex items-center text-[#4e6688] font-semibold rounded-lg px-4 py-2 hover:bg-[#f3f8fa] transition"
+            >
+              <svg
+                class="w-6 h-6 mr-2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back
+            </button>
+            <button
+              type="button"
+              (click)="goToDoctorSelection()"
+              class="bg-[#4e6688] text-white font-bold px-10 py-3 rounded-lg shadow hover:bg-[#98d2c0] hover:text-[#29374f] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="!booking.service_id"
+            >
+              <span class="flex items-center gap-2">
+                VIEW DOCTORS
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Doctor Selection (for Book by Doctor) or STEP 4: Doctor Selection (for Book by Service) -->
+      <div
+        *ngIf="
+          (currentStep === 3 && bookingType === 'docfirst') ||
+          (currentStep === 4 && bookingType === 'serfirst')
+        "
+        class="step-content"
+      >
+        <div class="max-w-7xl mx-auto py-8 space-y-8 text-[#4e6688]">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-extrabold text-[#4e6688] font-poppins">
+              {{
+                bookingType === "serfirst"
+                  ? "Available Doctors"
+                  : "Select Doctor"
+              }}
+            </h3>
+            <div class="flex items-center gap-4">
+              <label class="text-sm font-medium text-[#4e6688]">Sort by:</label>
+              <select
+                [(ngModel)]="doctorSort"
+                (ngModelChange)="sortDoctors()"
+                class="px-3 py-2 rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-sm outline-none bg-white"
+              >
+                <option value="name">Name</option>
+                <option value="specialization">Specialization</option>
+              </select>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div
+              *ngFor="let doctor of availableDoctors"
+              (click)="selectDoctor(doctor)"
+              class="doctor-card bg-white border border-gray-200 rounded-lg p-6 cursor-pointer"
+              [ngClass]="{ selected: booking.doctor_id === doctor.doctor_id }"
+            >
+              <div class="text-lg font-semibold text-[#4e6688]">
+                {{ doctor.full_name }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ doctor.specialization }}
+              </div>
+            </div>
+            <div *ngIf="availableDoctors.length === 0" class="text-gray-500">
+              No doctors available.
+            </div>
+            <div
+              *ngIf="formSubmitted && !booking.doctor_id"
+              class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Please select a doctor.
+            </div>
+          </div>
+          <div
+            class="mt-10 flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200"
+          >
+            <button
+              type="button"
+              (click)="backFromDoctorSelection()"
+              class="flex items-center text-[#4e6688] font-semibold rounded-lg px-4 py-2 hover:bg-[#f3f8fa] transition"
+            >
+              <svg
+                class="w-6 h-6 mr-2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              {{ bookingType === "serfirst" ? "Back to Services" : "Back" }}
+            </button>
+            <button
+              *ngIf="bookingType === 'docfirst'"
+              type="button"
+              (click)="goToScheduleSelection()"
+              class="bg-[#4e6688] text-white font-bold px-10 py-3 rounded-lg shadow hover:bg-[#98d2c0] hover:text-[#29374f] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="!booking.doctor_id"
+            >
+              <span class="flex items-center gap-2">
+                VIEW SCHEDULE
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 or 5: Schedule Selection -->
+      <div
+        *ngIf="
+          (currentStep === 4 && bookingType === 'docfirst') ||
+          (currentStep === 5 && bookingType === 'serfirst')
+        "
+        class="step-content"
+      >
+        <div class="max-w-7xl mx-auto py-8 space-y-8 text-[#4e6688]">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-extrabold text-[#4e6688] font-poppins">
+              Select Appointment Time
+            </h3>
+            <div class="text-right">
+              <div class="text-lg font-semibold text-[#4e6688]">
+                {{ selectedDoctor?.full_name }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ selectedDoctor?.specialization }}
+              </div>
+            </div>
+          </div>
+
+          <form #scheduleForm="ngForm" (ngSubmit)="submitStep3(scheduleForm)">
+            <!-- Date Selection -->
+            <div class="mb-6">
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Preferred Date <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                [(ngModel)]="booking.preferred_date"
+                name="preferred_date"
+                required
+                #preferredDate="ngModel"
+                (ngModelChange)="fetchAvailableSlots()"
+                [min]="today"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-base font-medium outline-none bg-white transition"
+                [ngClass]="{
+                  'border-red-400': preferredDate.invalid && formSubmitted
+                }"
+              />
+              <div
+                *ngIf="preferredDate.invalid && formSubmitted"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please select a valid date.
+              </div>
+            </div>
+
+            <!-- Time Slots -->
+            <div class="mb-6">
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Available Time Slots <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button
+                  *ngFor="let slot of availableSlots"
+                  type="button"
+                  (click)="selectTime(slot)"
+                  class="time-slot bg-white border border-gray-200 rounded-lg p-3 text-center"
+                  [ngClass]="{
+                    selected: booking.preferred_time === slot.slot_time
+                  }"
+                >
+                  {{ slot.slot_time | date : "shortTime" }}
+                </button>
+                <div
+                  *ngIf="availableSlots.length === 0 && booking.preferred_date"
+                  class="text-red-500 text-sm mt-2"
+                >
+                  No available slots for the selected date.
+                </div>
+                <div
+                  *ngIf="formSubmitted && !booking.preferred_time"
+                  class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                  Please select a time slot.
+                </div>
+              </div>
+            </div>
+
+            <!-- Service Selection (for Book by Doctor flow) -->
+            <div *ngIf="bookingType === 'docfirst'" class="mb-6">
+              <label class="block text-lg font-semibold mb-3 text-[#4e6688]">
+                Select Service <span class="text-red-500">*</span>
+              </label>
+              <select
+                [(ngModel)]="booking.service_id"
+                name="service_id"
+                required
+                #serviceId="ngModel"
+                class="px-4 py-3 w-full rounded-lg border border-gray-200 focus:border-[#4e6688] focus:ring-1 focus:ring-[#4e6688] text-base font-medium outline-none bg-white transition"
+                [ngClass]="{
+                  'border-red-400': serviceId.invalid && formSubmitted
+                }"
+              >
+                <option value="">Select a service...</option>
+                <option
+                  *ngFor="let service of services"
+                  [value]="service.service_id"
+                >
+                  {{ service.name }}
+                </option>
+              </select>
+              <div
+                *ngIf="serviceId.invalid && formSubmitted"
+                class="error-message text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Please select a service.
+              </div>
+            </div>
+
+            <div
+              class="mt-10 flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200"
+            >
+              <button
+                type="button"
+                (click)="backFromScheduleSelection()"
+                class="flex items-center text-[#4e6688] font-semibold rounded-lg px-4 py-2 hover:bg-[#f3f8fa] transition"
+              >
+                <svg
+                  class="w-6 h-6 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Back
+              </button>
+              <button
+                type="submit"
+                class="bg-[#4e6688] text-white font-bold px-10 py-3 rounded-lg shadow hover:bg-[#98d2c0] hover:text-[#29374f] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="
+                  scheduleForm.invalid ||
+                  !booking.preferred_time ||
+                  (bookingType === 'docfirst' && !booking.service_id)
+                "
+              >
+                <span class="flex items-center gap-2">
+                  CONFIRM APPOINTMENT
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    ></path>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
