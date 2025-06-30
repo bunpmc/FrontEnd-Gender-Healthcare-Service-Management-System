@@ -1,354 +1,408 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-interface PhoneRegion {
-  code: string;
-  flag: string;
-  name: string;
-  dialCode: string;
-  format: string;
-  placeholder: string;
-}
-
-interface BookingState {
-  type?: 'docfirst' | 'serfirst';
-  fullName?: string;
-  email?: string;
-  phone?: string;
-  phoneRegion?: string;
-  gender?: 'male' | 'female' | 'other';
-  message?: string;
-  doctor_id?: string;
-  service_id?: string;
-  preferred_date?: string;
-  preferred_time?: string;
-  preferred_slot_id?: string;
-  schedule?: 'Morning' | 'Afternoon' | 'Evening'; // Added schedule property
-}
-
-interface Doctor {
-  doctor_id: string;
-  full_name: string;
-  specialization?: string;
-  services?: string[]; // Array of service IDs the doctor provides
-}
-
-interface Service {
-  service_id: string;
-  name: string;
-  description?: string;
-}
-
-interface TimeSlot {
-  doctor_slot_id: string;
-  slot_date: string;
-  slot_time: string;
-  doctor_id: string;
-}
+import {
+  BookingState,
+  DoctorBooking,
+  DoctorSlotDetail,
+  PhoneRegion,
+  ServiceBooking,
+  TimeSlot,
+} from '../../models/booking.model';
+import {
+  MOCK_DOCTOR_SLOTS,
+  MOCK_DOCTORS,
+  MOCK_PHONE_REGIONS,
+  MOCK_SERVICES,
+} from '../../data/mock-data';
 
 @Component({
   selector: 'app-appointmentPage',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './appointment-page.component.html',
   styleUrls: ['./appointment-page.component.css'],
 })
 export class AppointmentPageComponent implements OnInit {
-  private http = inject(HttpClient);
+  // ========== CORE STATE ==========
   private router = inject(Router);
-
-  // Component state
-  currentStep: number = 1;
+  currentStep: number = 0;
   bookingType: 'docfirst' | 'serfirst' | null = null;
+  selectedType: 'serfirst' | 'docfirst' | null = null;
   formSubmitted: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
-  doctorSort: 'name' | 'specialization' = 'name';
-
-  // Data
   booking: BookingState = {};
-  doctors: Doctor[] = [];
-  services: Service[] = [];
-  availableDoctors: Doctor[] = [];
-  availableSlots: TimeSlot[] = [];
+  slotsForSelectedDate: DoctorSlotDetail[] = [];
 
-  // Phone regions
-  phoneRegions: PhoneRegion[] = [
-    {
-      code: 'VN',
-      flag: '🇻🇳',
-      name: 'Vietnam',
-      dialCode: '+84',
-      format: 'XXX XXX XXX',
-      placeholder: '901 234 567',
-    },
-    {
-      code: 'US',
-      flag: '🇺🇸',
-      name: 'United States',
-      dialCode: '+1',
-      format: '(XXX) XXX-XXXX',
-      placeholder: '(555) 123-4567',
-    },
-    {
-      code: 'GB',
-      flag: '🇬🇧',
-      name: 'United Kingdom',
-      dialCode: '+44',
-      format: 'XXXX XXX XXX',
-      placeholder: '7911 123456',
-    },
-    {
-      code: 'AU',
-      flag: '🇦🇺',
-      name: 'Australia',
-      dialCode: '+61',
-      format: 'XXX XXX XXX',
-      placeholder: '412 345 678',
-    },
-    {
-      code: 'CA',
-      flag: '🇨🇦',
-      name: 'Canada',
-      dialCode: '+1',
-      format: '(XXX) XXX-XXXX',
-      placeholder: '(555) 123-4567',
-    },
-  ];
+  // ========== DATA SOURCES ==========
+  doctors: DoctorBooking[] = [];
+  services: ServiceBooking[] = [];
+  availableDoctors: DoctorBooking[] = [];
+  selectedDoctor: DoctorBooking | null = null;
 
-  selectedPhoneRegion: PhoneRegion = this.phoneRegions[0];
-  selectedDoctor: Doctor | null = null;
+  // ========== PHONE REGION ==========
+  phoneRegions: PhoneRegion[] = MOCK_PHONE_REGIONS;
+  selectedPhoneRegion: PhoneRegion = MOCK_PHONE_REGIONS[0];
 
-  // Computed properties
-  get progressWidth(): string {
-    const steps = this.bookingType === 'serfirst' ? 5 : 4;
-    return `${(this.currentStep / steps) * 100}%`;
-  }
+  // ========== FILTERS ==========
+  doctorSort: 'name' | 'specialization' = 'name';
+  doctorGenderFilter: '' | 'male' | 'female' = '';
+  doctorSearch: string = '';
+  serviceSearch: string = '';
+  serviceSort: 'name' | 'desc' = 'name';
 
-  get today(): string {
-    return new Date().toISOString().split('T')[0];
-  }
+  // ========== SLOT STATE STEP 4 ==========
+  availableDates: string[] = [];
+  selectedDate: string = '';
 
+  // ========== INIT ==========
   ngOnInit(): void {
+    this.doctors = MOCK_DOCTORS;
+    this.services = MOCK_SERVICES;
+    this.availableDoctors = [...MOCK_DOCTORS];
     this.loadBookingState();
-    this.fetchDoctors();
-    this.fetchServices();
     if (this.booking.phoneRegion) {
       const savedRegion = this.phoneRegions.find(
         (r) => r.code === this.booking.phoneRegion
       );
-      if (savedRegion) {
-        this.selectedPhoneRegion = savedRegion;
-      }
+      if (savedRegion) this.selectedPhoneRegion = savedRegion;
     }
   }
-
-  // Navigation methods
-  chooseBookingType(type: 'docfirst' | 'serfirst'): void {
-    this.bookingType = type;
-    this.booking.type = type;
-    this.currentStep = 2;
-    this.errorMessage = null;
-    this.saveBookingState();
+  get progressWidth(): string {
+    // Tổng số bước thực hiện là 5 (step 0 ~ 4, có thể tùy thực tế của bạn)
+    const totalSteps = 5;
+    // Nếu có step submit cuối cùng thì đổi thành 6.
+    const percent = Math.floor((this.currentStep / (totalSteps - 1)) * 100);
+    return percent + '%';
   }
 
-  backStep2(): void {
-    this.currentStep = 1;
-    this.bookingType = null;
-    this.booking.type = undefined;
-    this.saveBookingState();
+  // ========== STEP/NAVIGATION ==========
+  chooseBookingType(type: 'serfirst' | 'docfirst' | null) {
+    if (type) {
+      this.bookingType = type;
+      this.booking.type = type;
+      this.currentStep = 1;
+      this.errorMessage = null;
+      this.saveBookingState();
+    }
   }
-
-  backStep3(): void {
-    this.currentStep = 2;
-    this.formSubmitted = false;
-    this.errorMessage = null;
-  }
-
-  backFromDoctorSelection(): void {
+  goToNextStep() {
     if (this.bookingType === 'serfirst') {
-      this.currentStep = 3;
-      this.booking.doctor_id = undefined;
-      this.availableDoctors = [];
-      this.availableSlots = [];
+      if (this.currentStep === 2) this.getDoctorsByService();
+      this.currentStep++;
+    } else if (this.bookingType === 'docfirst') {
+      this.currentStep++;
+    }
+    if (this.currentStep === 4) this.initSlotStep();
+    this.formSubmitted = false;
+    this.errorMessage = null;
+    this.saveBookingState();
+  }
+  goToPrevStep() {
+    if (this.currentStep === 1) {
+      this.bookingType = null;
+      this.booking.type = undefined;
+      this.currentStep = 0;
     } else {
-      this.currentStep = 2;
+      this.currentStep = Math.max(0, this.currentStep - 1);
     }
     this.formSubmitted = false;
     this.errorMessage = null;
+    this.saveBookingState();
   }
 
-  backFromScheduleSelection(): void {
-    this.currentStep = this.bookingType === 'serfirst' ? 4 : 3;
-    this.booking.preferred_date = undefined;
-    this.booking.preferred_time = undefined;
-    this.booking.preferred_slot_id = undefined;
-    this.availableSlots = [];
-    this.formSubmitted = false;
-    this.errorMessage = null;
-  }
-
-  goToDoctorSelection(): void {
-    if (!this.booking.service_id) {
-      this.formSubmitted = true;
-      this.errorMessage = 'Please select a service.';
-      this.scrollToFirstError();
-      return;
-    }
-    this.currentStep = 4;
-    this.fetchDoctorsByService();
-  }
-
-  goToScheduleSelection(): void {
-    if (!this.booking.doctor_id) {
-      this.formSubmitted = true;
-      this.errorMessage = 'Please select a doctor.';
-      this.scrollToFirstError();
-      return;
-    }
-    this.currentStep = this.bookingType === 'serfirst' ? 5 : 4;
-    this.fetchAvailableSlots();
-  }
-
-  submitStep2(form: NgForm): void {
+  // ========== FORM ACTIONS ==========
+  onContinueService(): void {
     this.formSubmitted = true;
     this.errorMessage = null;
-
+    if (!this.booking.service_id) {
+      this.errorMessage = 'Please select a service to continue.';
+      return;
+    }
+    this.goToNextStep();
+  }
+  onContinueDoctor(): void {
+    this.formSubmitted = true;
+    this.errorMessage = null;
+    if (!this.booking.doctor_id) {
+      this.errorMessage = 'Please select a doctor.';
+      return;
+    }
+    this.goToNextStep();
+  }
+  submitPatientForm(form: NgForm): void {
+    this.formSubmitted = true;
+    this.errorMessage = null;
     if (this.isFormValidStep2(form)) {
-      this.currentStep = this.bookingType === 'serfirst' ? 3 : 3;
-      this.formSubmitted = false;
-      if (this.bookingType === 'serfirst') {
-        // No need to fetch services here as they are already loaded
-      } else {
+      if (this.bookingType === 'docfirst') {
         this.availableDoctors = [...this.doctors];
       }
-      this.saveBookingState();
+      this.goToNextStep();
     } else {
       this.scrollToFirstError();
     }
   }
 
-  submitStep3(form: NgForm): void {
-    this.formSubmitted = true;
-    this.errorMessage = null;
-    this.successMessage = null;
-
-    if (
-      form.valid &&
-      this.isTimeValid() &&
-      (this.bookingType !== 'docfirst' || this.booking.service_id)
-    ) {
-      const selectedSlot = this.availableSlots.find(
-        (slot) => slot.slot_time === this.booking.preferred_time
-      );
-      this.booking.preferred_slot_id = selectedSlot?.doctor_slot_id;
-      this.booking.schedule = this.inferSchedule(this.booking.preferred_time!);
-
-      const phoneForApi = this.getFullPhoneNumber();
-
-      const payload = {
-        fullName: this.booking.fullName,
-        email: this.booking.email || undefined,
-        phone: phoneForApi,
-        gender: this.booking.gender || 'other',
-        schedule: this.booking.schedule,
-        message: this.booking.message,
-        doctor_id: this.booking.doctor_id,
-        service_id: this.booking.service_id,
-        preferred_date: this.booking.preferred_date,
-        preferred_time: this.booking.preferred_time,
-        preferred_slot_id: this.booking.preferred_slot_id,
-        visit_type: 'consultation',
-      };
-
-      this.http
-        .post(
-          'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/book-appointment',
-          payload
-        )
-        .subscribe({
-          next: (response: any) => {
-            if (response.success) {
-              this.successMessage = response.message;
-              this.resetForm();
-              this.router.navigate(['/confirmation'], {
-                state: {
-                  appointment: response.data.appointment,
-                  slot_info: response.data.slot_info,
-                },
-              });
-            } else {
-              this.errorMessage =
-                response.error || 'Failed to book appointment';
-              if (response.details?.available_slots) {
-                this.availableSlots = response.details.available_slots.map(
-                  (slot: any) => ({
-                    doctor_slot_id: slot.slot_id,
-                    slot_date: slot.date,
-                    slot_time: slot.time,
-                    doctor_id: this.booking.doctor_id,
-                  })
-                );
-              }
-            }
-          },
-          error: (err) => {
-            this.errorMessage =
-              err.error?.error ||
-              'Failed to book appointment. Please check your phone number format.';
-            if (err.error?.details?.available_slots) {
-              this.availableSlots = err.error.details.available_slots.map(
-                (slot: any) => ({
-                  doctor_slot_id: slot.slot_id,
-                  slot_date: slot.date,
-                  slot_time: slot.time,
-                  doctor_id: this.booking.doctor_id,
-                })
-              );
-            }
-          },
-        });
-    } else {
-      this.errorMessage = 'Please complete all required fields.';
-      this.scrollToFirstError();
-    }
-  }
-
-  // Selection methods
-  selectService(service: Service): void {
+  selectService(service: ServiceBooking): void {
     this.booking.service_id = service.service_id;
     this.saveBookingState();
   }
-
-  selectDoctor(doctor: Doctor): void {
+  selectDoctor(doctor: DoctorBooking): void {
     this.booking.doctor_id = doctor.doctor_id;
     this.selectedDoctor = doctor;
-    if (this.bookingType === 'serfirst') {
-      this.goToScheduleSelection();
+    this.saveBookingState();
+  }
+
+  // ========== STEP 4: SLOT LOGIC ==========
+  initSlotStep() {
+    // Chỉ lấy slot đúng doctor đang chọn
+    const allSlots = MOCK_DOCTOR_SLOTS.filter(
+      (slot) => slot.doctor_id === this.booking.doctor_id && slot.is_active
+    );
+    this.availableDates = Array.from(new Set(allSlots.map((s) => s.slot_date)));
+    this.availableDates.sort();
+    this.selectedDate = this.availableDates.includes(this.selectedDate)
+      ? this.selectedDate
+      : this.availableDates[0] || '';
+    this.updateSlotsForDate();
+  }
+  onDateChange(date: string) {
+    this.selectedDate = date;
+    this.updateSlotsForDate();
+    this.booking.preferred_slot_id = undefined;
+    this.booking.preferred_time = undefined;
+  }
+  updateSlotsForDate() {
+    this.slotsForSelectedDate = MOCK_DOCTOR_SLOTS.filter(
+      (slot) =>
+        slot.doctor_id === this.booking.doctor_id &&
+        slot.slot_date === this.selectedDate
+    ).sort((a, b) => a.slot_time.localeCompare(b.slot_time));
+  }
+  selectSlot(slot: DoctorSlotDetail) {
+    if (slot.is_active && slot.appointments_count < slot.max_appointments) {
+      this.booking.preferred_slot_id = slot.doctor_slot_id;
+      this.booking.preferred_time = slot.slot_time;
+      this.formSubmitted = false;
+      this.saveBookingState();
     }
-    this.saveBookingState();
+  }
+  onContinueSlot() {
+    this.formSubmitted = true;
+    if (!this.booking.preferred_slot_id) {
+      this.errorMessage = 'Please select a time slot to continue.';
+      return;
+    }
+    this.goToNextStep();
   }
 
-  selectTime(slot: TimeSlot): void {
-    this.booking.preferred_time = slot.slot_time;
-    this.booking.preferred_slot_id = slot.doctor_slot_id;
-    this.saveBookingState();
+  // ========== FILTERS, SEARCH, SORT ==========
+  normalizeString(str: string): string {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+  perfectPrefixMatch(haystack: string, needle: string): boolean {
+    const hay = this.normalizeString(haystack);
+    const need = this.normalizeString(needle).trim();
+    return hay.startsWith(need);
+  }
+  fuzzyMatch(fullName: string, keyword: string): boolean {
+    const normName = this.normalizeString(fullName);
+    const normQuery = this.normalizeString(keyword);
+    const words = normQuery.split(' ');
+    return words.every((w) => normName.includes(w));
   }
 
-  sortDoctors(): void {
-    this.availableDoctors = [...this.availableDoctors].sort((a, b) => {
+  get filteredDoctors(): DoctorBooking[] {
+    let list = this.getAvailableDoctors();
+    if (this.doctorGenderFilter) {
+      list = list.filter((doc) => doc.gender === this.doctorGenderFilter);
+    }
+    if (this.doctorSearch && this.doctorSearch.trim()) {
+      const searchNorm = this.normalizeString(this.doctorSearch.trim());
+      let exactMatch = list.filter((doc) =>
+        this.normalizeString(doc.full_name).includes(searchNorm)
+      );
+      if (exactMatch.length > 0) {
+        list = exactMatch;
+      } else {
+        const keywords = searchNorm.split(' ');
+        list = list.filter((doc) => {
+          const docNameNorm = this.normalizeString(doc.full_name);
+          return keywords.every((kw) => docNameNorm.includes(kw));
+        });
+      }
+    }
+    list = list.slice().sort((a, b) => {
       if (this.doctorSort === 'name') {
         return a.full_name.localeCompare(b.full_name);
-      } else {
+      } else if (this.doctorSort === 'specialization') {
         return (a.specialization || '').localeCompare(b.specialization || '');
       }
+      return 0;
     });
+    return list;
   }
 
-  // Phone number handling
+  get filteredServices(): ServiceBooking[] {
+    let list = this.getAvailableServices();
+    if (!this.serviceSearch || this.serviceSearch.trim().length < 2) {
+      return list.slice().sort((a, b) => {
+        if (this.serviceSort === 'name') return a.name.localeCompare(b.name);
+        if (this.serviceSort === 'desc')
+          return (a.description || '').localeCompare(b.description || '');
+        return 0;
+      });
+    }
+    const keywords = this.normalizeString(this.serviceSearch).split(' ');
+    list = list.filter((svc) => {
+      const haystack = this.normalizeString(
+        svc.name + ' ' + (svc.description ?? '')
+      );
+      return keywords.every((kw) => haystack.includes(kw));
+    });
+    list = list.slice().sort((a, b) => {
+      const aPerfect = this.perfectPrefixMatch(a.name, this.serviceSearch);
+      const bPerfect = this.perfectPrefixMatch(b.name, this.serviceSearch);
+      if (aPerfect && !bPerfect) return -1;
+      if (!aPerfect && bPerfect) return 1;
+      if (this.serviceSort === 'name') return a.name.localeCompare(b.name);
+      if (this.serviceSort === 'desc')
+        return (a.description || '').localeCompare(b.description || '');
+      return 0;
+    });
+    return list;
+  }
+
+  get filteredDoctorServices(): ServiceBooking[] {
+    if (this.bookingType === 'docfirst' && this.currentStep === 3) {
+      let list = this.getDoctorServices();
+      if (!this.serviceSearch || this.serviceSearch.trim().length < 2) {
+        return list.slice().sort((a, b) => {
+          if (this.serviceSort === 'name') return a.name.localeCompare(b.name);
+          if (this.serviceSort === 'desc')
+            return (a.description || '').localeCompare(b.description || '');
+          return 0;
+        });
+      }
+      const keywords = this.normalizeString(this.serviceSearch).split(' ');
+      list = list.filter((svc) => {
+        const haystack = this.normalizeString(
+          svc.name + ' ' + (svc.description ?? '')
+        );
+        return keywords.every((kw) => haystack.includes(kw));
+      });
+      list = list.slice().sort((a, b) => {
+        const aPerfect = this.perfectPrefixMatch(a.name, this.serviceSearch);
+        const bPerfect = this.perfectPrefixMatch(b.name, this.serviceSearch);
+        if (aPerfect && !bPerfect) return -1;
+        if (!aPerfect && bPerfect) return 1;
+        if (this.serviceSort === 'name') return a.name.localeCompare(b.name);
+        if (this.serviceSort === 'desc')
+          return (a.description || '').localeCompare(b.description || '');
+        return 0;
+      });
+      return list;
+    }
+    return [];
+  }
+
+  private getAvailableDoctors(): DoctorBooking[] {
+    if (this.bookingType === 'serfirst' && this.booking.service_id) {
+      return this.doctors.filter((d) =>
+        d.services?.includes(this.booking.service_id!)
+      );
+    }
+    return [
+      ...(this.availableDoctors.length ? this.availableDoctors : this.doctors),
+    ];
+  }
+  private getAvailableServices(): ServiceBooking[] {
+    if (this.bookingType === 'docfirst' && this.booking.doctor_id) {
+      const doc = this.doctors.find(
+        (d) => d.doctor_id === this.booking.doctor_id
+      );
+      if (doc?.services) {
+        return this.services.filter((svc) =>
+          doc.services!.includes(svc.service_id)
+        );
+      }
+      return [];
+    }
+    return [...this.services];
+  }
+  getDoctorServices(): ServiceBooking[] {
+    const doctor = this.doctors.find(
+      (d) => d.doctor_id === this.booking.doctor_id
+    );
+    if (!doctor || !doctor.services) return [];
+    return this.services.filter((svc) =>
+      doctor.services?.includes(svc.service_id)
+    );
+  }
+
+  // ========== UI EVENTS ==========
+  onDoctorSearchChange(): void {}
+  onDoctorGenderFilterChange(): void {}
+  onDoctorSortChange(): void {}
+  clearDoctorSearch(): void {
+    this.doctorSearch = '';
+  }
+  clearDoctorGenderFilter(): void {
+    this.doctorGenderFilter = '';
+  }
+  onServiceSearchChange(): void {}
+  onServiceSortChange(): void {}
+  clearServiceSearch(): void {
+    this.serviceSearch = '';
+  }
+
+  getDoctorsByService(): void {
+    if (!this.booking.service_id) return;
+    this.availableDoctors = this.doctors.filter((d) =>
+      d.services?.includes(this.booking.service_id!)
+    );
+    this.booking.doctor_id = undefined;
+    this.selectedDoctor = null;
+    this.doctorSearch = '';
+    this.doctorGenderFilter = '';
+  }
+
+  // ========== DISPLAY HELPERS ==========
+  getSelectedServiceName(): string {
+    const service = this.services.find(
+      (s) => s.service_id === this.booking.service_id
+    );
+    return service ? service.name : '';
+  }
+  getSelectedDoctorName(): string {
+    const doctor = this.doctors.find(
+      (d) => d.doctor_id === this.booking.doctor_id
+    );
+    return doctor ? doctor.full_name : '';
+  }
+  getDoctorResultCount(): string {
+    const total = this.getAvailableDoctors().length;
+    const filtered = this.filteredDoctors.length;
+    if (filtered === total) return `Showing all ${total} doctors`;
+    return `Showing ${filtered} of ${total} doctors`;
+  }
+  getServiceResultCount(): string {
+    const baseList = this.getAvailableServices();
+    const total = baseList.length;
+    const filtered = this.filteredServices.length;
+    if (filtered === total) return `Showing all ${total} services`;
+    return `Showing ${filtered} of ${total} services`;
+  }
+
+  // ========== PHONE, EMAIL, VALIDATION ==========
   onPhoneRegionChange(regionCode: string): void {
     const region = this.phoneRegions.find((r) => r.code === regionCode);
     if (region) {
@@ -358,7 +412,6 @@ export class AppointmentPageComponent implements OnInit {
       this.saveBookingState();
     }
   }
-
   formatPhoneNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
     const phone = input.value;
@@ -366,9 +419,7 @@ export class AppointmentPageComponent implements OnInit {
       this.booking.phone = '';
       return;
     }
-
     let cleanedPhone = phone.replace(/\D/g, '');
-
     switch (this.selectedPhoneRegion.code) {
       case 'VN':
         cleanedPhone = this.formatVietnamesePhone(cleanedPhone);
@@ -384,81 +435,38 @@ export class AppointmentPageComponent implements OnInit {
         cleanedPhone = this.formatAustralianPhone(cleanedPhone);
         break;
     }
-
     this.booking.phone = cleanedPhone;
     this.saveBookingState();
   }
-
   private formatVietnamesePhone(digits: string): string {
-    if (digits.startsWith('0')) {
-      digits = digits.substring(1);
-    }
-    if (digits.startsWith('84')) {
-      digits = digits.substring(2);
-    }
-    if (digits.length <= 3) {
-      return digits;
-    } else if (digits.length <= 6) {
-      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    } else {
-      return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(
-        6,
-        9
-      )}`;
-    }
+    if (digits.startsWith('0')) digits = digits.substring(1);
+    if (digits.startsWith('84')) digits = digits.substring(2);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 9)}`;
   }
-
   private formatNorthAmericanPhone(digits: string): string {
-    if (digits.startsWith('1')) {
-      digits = digits.substring(1);
-    }
-    if (digits.length <= 3) {
-      return `(${digits}`;
-    } else if (digits.length <= 6) {
-      return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-    } else {
-      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(
-        6,
-        10
-      )}`;
-    }
+    if (digits.startsWith('1')) digits = digits.substring(1);
+    if (digits.length <= 3) return `(${digits}`;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(
+      6,
+      10
+    )}`;
   }
-
   private formatUKPhone(digits: string): string {
-    if (digits.startsWith('44')) {
-      digits = digits.substring(2);
-    }
-    if (digits.length <= 4) {
-      return digits;
-    } else if (digits.length <= 7) {
-      return `${digits.slice(0, 4)} ${digits.slice(4)}`;
-    } else {
-      return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(
-        7,
-        10
-      )}`;
-    }
+    if (digits.startsWith('44')) digits = digits.substring(2);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+    return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 10)}`;
   }
-
   private formatAustralianPhone(digits: string): string {
-    if (digits.startsWith('61')) {
-      digits = digits.substring(2);
-    }
-    if (digits.startsWith('0')) {
-      digits = digits.substring(1);
-    }
-    if (digits.length <= 3) {
-      return digits;
-    } else if (digits.length <= 6) {
-      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    } else {
-      return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(
-        6,
-        9
-      )}`;
-    }
+    if (digits.startsWith('61')) digits = digits.substring(2);
+    if (digits.startsWith('0')) digits = digits.substring(1);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 9)}`;
   }
-
   getFullPhoneNumber(): string {
     if (!this.booking.phone) return '';
     const digits = this.booking.phone.replace(/\D/g, '');
@@ -476,12 +484,8 @@ export class AppointmentPageComponent implements OnInit {
         return `${this.selectedPhoneRegion.dialCode}${digits}`;
     }
   }
-
-  // Validation methods
   isPhoneValid(): boolean {
-    if (!this.booking.phone) {
-      return false;
-    }
+    if (!this.booking.phone) return false;
     const digits = this.booking.phone.replace(/\D/g, '');
     switch (this.selectedPhoneRegion.code) {
       case 'VN':
@@ -497,13 +501,16 @@ export class AppointmentPageComponent implements OnInit {
         return digits.length >= 7 && digits.length <= 15;
     }
   }
-
   isTimeValid(): boolean {
     if (!this.booking.preferred_time) return false;
     const timeRegex = /^([01]\d|2[0-3]):[0-5]\d:00$/;
     return timeRegex.test(this.booking.preferred_time);
   }
-
+  private isEmailValid(): boolean {
+    if (!this.booking.email) return true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(this.booking.email);
+  }
   private isFormValidStep2(form: NgForm): boolean {
     const hasValidPhone = this.isPhoneValid();
     const hasFullName = !!this.booking.fullName?.trim();
@@ -518,101 +525,7 @@ export class AppointmentPageComponent implements OnInit {
     );
   }
 
-  private isEmailValid(): boolean {
-    if (!this.booking.email) return true;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.booking.email);
-  }
-
-  // Data fetching methods
-  fetchDoctors(): void {
-    this.http
-      .get<Doctor[]>(
-        'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/fetch-doctor'
-      )
-      .subscribe({
-        next: (data) => {
-          this.doctors = data;
-          this.availableDoctors = data;
-        },
-        error: (err) => {
-          this.errorMessage = 'Failed to fetch doctors';
-          console.error(err);
-        },
-      });
-  }
-
-  fetchServices(): void {
-    this.http
-      .get<Service[]>(
-        'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/fetch-service'
-      )
-      .subscribe({
-        next: (data) => {
-          this.services = data;
-        },
-        error: (err) => {
-          this.errorMessage = 'Failed to fetch services';
-          console.error(err);
-        },
-      });
-  }
-
-  fetchDoctorsByService(): void {
-    if (!this.booking.service_id) return;
-    this.http
-      .post<Doctor[]>(
-        'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/fetch-doctor',
-        { service_id: this.booking.service_id }
-      )
-      .subscribe({
-        next: (data) => {
-          this.availableDoctors = data;
-          this.booking.doctor_id = undefined;
-          this.availableSlots = [];
-          this.sortDoctors();
-        },
-        error: (err) => {
-          this.errorMessage = 'Failed to fetch doctors for service';
-          console.error(err);
-        },
-      });
-  }
-
-  fetchAvailableSlots(): void {
-    if (!this.booking.doctor_id || !this.booking.preferred_date) return;
-    this.http
-      .post<TimeSlot[]>(
-        'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/get-available-slots',
-        {
-          p_doctor_id: this.booking.doctor_id,
-          p_slot_date: this.booking.preferred_date,
-          p_start_time: '00:00:00',
-          p_end_time: '23:59:59',
-          p_slot_id: null,
-        }
-      )
-      .subscribe({
-        next: (data) => {
-          this.availableSlots = data;
-          this.booking.preferred_time = undefined;
-          this.booking.preferred_slot_id = undefined;
-        },
-        error: (err) => {
-          this.errorMessage = 'Failed to fetch available slots';
-          console.error(err);
-        },
-      });
-  }
-
-  // Utility methods
-  private inferSchedule(time: string): 'Morning' | 'Afternoon' | 'Evening' {
-    const [hour] = time.split(':').map(Number);
-    if (hour >= 8 && hour < 13) return 'Morning';
-    if (hour >= 13 && hour < 18) return 'Afternoon';
-    return 'Evening';
-  }
-
+  // ========== FINAL SUBMIT/UTILS ==========
   private scrollToFirstError(): void {
     setTimeout(() => {
       const errorElement = document.querySelector('.border-red-400');
@@ -624,8 +537,6 @@ export class AppointmentPageComponent implements OnInit {
       }
     }, 100);
   }
-
-  // Local storage methods
   private loadBookingState(): void {
     try {
       const saved = localStorage.getItem('bookingState');
@@ -637,21 +548,16 @@ export class AppointmentPageComponent implements OnInit {
         }
       }
     } catch (error) {
-      console.error('Error loading booking state:', error);
       this.booking = {};
-      this.currentStep = 1;
+      this.currentStep = 0;
     }
   }
-
   private saveBookingState(): void {
     try {
       this.booking.phoneRegion = this.selectedPhoneRegion.code;
       localStorage.setItem('bookingState', JSON.stringify(this.booking));
-    } catch (error) {
-      console.error('Error saving booking state:', error);
-    }
+    } catch (error) {}
   }
-
   hasBookingData(): boolean {
     return !!(
       this.booking.type ||
@@ -668,26 +574,28 @@ export class AppointmentPageComponent implements OnInit {
       this.booking.schedule
     );
   }
-
   resetForm(): void {
     this.booking = {};
-    this.currentStep = 1;
+    this.currentStep = 0;
     this.bookingType = null;
     this.formSubmitted = false;
     this.errorMessage = null;
     this.successMessage = null;
     this.selectedPhoneRegion = this.phoneRegions[0];
-    this.availableDoctors = [];
-    this.availableSlots = [];
+    this.availableDoctors = [...this.doctors];
     this.selectedDoctor = null;
+    this.doctorGenderFilter = '';
+    this.doctorSearch = '';
+    this.serviceSearch = '';
+    this.serviceSort = 'name';
+    this.doctorSort = 'name';
     localStorage.removeItem('bookingState');
   }
-
   goHome(event: Event): void {
     event.preventDefault();
     if (this.hasBookingData()) {
       const confirmLeave = window.confirm(
-        'Bạn có chắc muốn rời khỏi trang đặt lịch? Dữ liệu sẽ bị xóa!'
+        'Are you sure you want to leave the booking page? All data will be lost!'
       );
       if (confirmLeave) {
         this.resetForm();

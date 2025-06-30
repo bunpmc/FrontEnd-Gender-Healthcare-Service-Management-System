@@ -2,15 +2,16 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import {
-  type ContactMessage,
-  type UserLogin,
-  type UserRegister,
-} from '../models/user.model';
-import { Doctor, DoctorDetail } from '../models/doctor.model';
+import { type UserLogin, type UserRegister } from '../models/user.model';
+import { type Doctor, type DoctorDetail } from '../models/doctor.model';
+
 import { Observable } from 'rxjs';
-import { Blog, BlogDetail } from '../models/blog.model';
-import { MedicalService, ServiceDetail } from '../models/service.model';
+import { type Blog, type BlogDetail } from '../models/blog.model';
+import {
+  type MedicalService,
+  type ServiceDetail,
+} from '../models/service.model';
+import { DoctorBooking, type TimeSlot } from '../models/booking.model';
 
 // ================== SERVICE DECORATOR ==================
 @Injectable({
@@ -168,6 +169,50 @@ export class UserService {
         params,
         headers: this.getHeaders(),
       }
+    );
+  }
+  // =========== FETCH DOCTOR BY SERVICE ===========
+  /**
+   * Lấy danh sách bác sĩ theo service_id
+   */
+  getDoctorsByService(service_id: string): Observable<DoctorBooking[]> {
+    return this.http.post<DoctorBooking[]>(
+      `${environment.apiEndpoint}/fetch-doctor`,
+      { service_id },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // =========== FETCH AVAILABLE SLOTS ===========
+  /**
+   * Lấy danh sách slot khả dụng theo bác sĩ và ngày
+   */
+  getAvailableSlots(
+    doctor_id: string,
+    slot_date: string
+  ): Observable<TimeSlot[]> {
+    return this.http.post<TimeSlot[]>(
+      `${environment.apiEndpoint}/get-available-slots`,
+      {
+        p_doctor_id: doctor_id,
+        p_slot_date: slot_date,
+        p_start_time: '00:00:00',
+        p_end_time: '23:59:59',
+        p_slot_id: null,
+      },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // =========== BOOK APPOINTMENT ===========
+  /**
+   * Đặt lịch hẹn mới
+   */
+  bookAppointment(payload: any): Observable<any> {
+    return this.http.post(
+      `${environment.apiEndpoint}/book-appointment`,
+      payload,
+      { headers: this.getHeaders() }
     );
   }
 }
