@@ -1,43 +1,48 @@
 import { Routes } from '@angular/router';
-import { PatientManagementComponent } from './patient-management/patient-management.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { StaffManagementComponent } from './staff-management/staff-management.component';
-import { AppointmentManagementComponent } from './appointment-management/appointment-management.component';
-import { ServiceManagementComponent } from './service-management/service-management.component';
-import { AnalyticManagementComponent } from './analytic-management/analytic-management.component';
+import { PatientManagementComponent } from './admin/patient-management/patient-management.component';
+import { DashboardComponent } from './admin/dashboard/dashboard.component';
+import { StaffManagementComponent } from './admin/staff-management/staff-management.component';
+import { AppointmentManagementComponent } from './admin/appointment-management/appointment-management.component';
+import { ServiceManagementComponent } from './admin/service-management/service-management.component';
+import { AnalyticManagementComponent } from './admin/analytic-management/analytic-management.component';
+import { DoctorDashboardComponent } from './doctor/doctor-dashboard/doctor-dashboard.component';
 
 export const routes: Routes = [
   {
-    path: 'dashboard',
+    path: 'admin/dashboard',
     component: DashboardComponent
   },
   {
-    path: 'analytic',
+    path: 'admin/analytic',
     component: AnalyticManagementComponent
   },
   {
-    path: 'patient',
+    path: 'admin/patient',
     component: PatientManagementComponent
   },
   {
-    path: 'staff',
+    path: 'admin/staff',
     component: StaffManagementComponent
   },
   {
-    path: 'appointment',
+    path: 'admin/appointment',
     component: AppointmentManagementComponent
   },
   {
-    path: 'services',
+    path: 'admin/services',
     component: ServiceManagementComponent
   },
   {
+    path: 'doctor/dashboard',
+    component: DoctorDashboardComponent
+  },
+  {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: 'admin/dashboard',
     pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: '/dashboard',
-  }
+    redirectTo: 'admin/dashboard',
+  },
 ];

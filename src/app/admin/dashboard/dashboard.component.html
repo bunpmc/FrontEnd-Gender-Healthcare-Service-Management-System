@@ -1,0 +1,13 @@
+<div class="flex flex-col min-h-screen bg-blue-100">
+  <app-header></app-header>
+  <div class="flex flex-row mx-6 gap-6 mb-4">
+    <app-sidebar></app-sidebar>
+    <div class="flex-1">
+      <app-stats-card class="mb-2"></app-stats-card>
+      <app-main-panels></app-main-panels>
+      <div *ngFor="let notification of notifications; trackBy: trackByNotificationId">
+        <!-- ...existing code for displaying notification... -->
+      </div>
+    </div>
+  </div>
+</div>

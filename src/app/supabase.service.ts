@@ -222,13 +222,13 @@ export class SupabaseService {
       .from('appointments')
       .select(`
       appointment_id,
-      start_time,
-      status,
+      created_at,
+      appointment_status,
       patient:patients(full_name)
     `)
-      .gte('start_time', `${today}T00:00:00+00:00`)
-      .lte('start_time', `${today}T23:59:59+00:00`)
-      .order('start_time', { ascending: true });
+      .gte('created_at', `${today}T00:00:00+00:00`)
+      .lte('created_at', `${today}T23:59:59+00:00`)
+      .order('created_at', { ascending: true });
 
     if (error) {
       console.error('Error fetching today\'s appointments:', error);
@@ -243,105 +243,105 @@ export class SupabaseService {
   //#region ANALYTIC
 
 
-// 🟦 KPI: Appointments Count
- async getAppointmentsCount(start: string, end: string) {
-  const { count } = await supabase
-    .from('appointments')
-    .select('*', { count: 'exact', head: true })
-    .gte('created_at', start)
-    .lte('created_at', end);
-  return count || 0;
-}
+  // 🟦 KPI: Appointments Count
+  async getAppointmentsCount(start: string, end: string) {
+    const { count } = await supabase
+      .from('appointments')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', start)
+      .lte('created_at', end);
+    return count || 0;
+  }
 
-// 🟦 KPI: New Patients Count
- async getNewPatientsCount(start: string, end: string) {
-  const { count } = await supabase
-    .from('patients')
-    .select('*', { count: 'exact', head: true })
-    .gte('created_at', start)
-    .lte('created_at', end);
-  return count || 0;
-}
+  // 🟦 KPI: New Patients Count
+  async getNewPatientsCount(start: string, end: string) {
+    const { count } = await supabase
+      .from('patients')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', start)
+      .lte('created_at', end);
+    return count || 0;
+  }
 
-// 🟦 KPI: Revenue Sum
- async getRevenueSum(start: string, end: string) {
-  const { data } = await supabase
-    .from('receipts')
-    .select('amount')
-    .gte('created_at', start)
-    .lte('created_at', end);
-  return data?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0;
-}
+  // 🟦 KPI: Revenue Sum
+  async getRevenueSum(start: string, end: string) {
+    const { data } = await supabase
+      .from('receipts')
+      .select('amount')
+      .gte('created_at', start)
+      .lte('created_at', end);
+    return data?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0;
+  }
 
-// 🟦 KPI: Task Completion Ratio
- async getTaskCompletionRatio(start: string, end: string) {
-  const { data } = await supabase
-    .from('appointments')
-    .select('appointment_status')
-    .gte('created_at', start)
-    .lte('created_at', end);
+  // 🟦 KPI: Task Completion Ratio
+  async getTaskCompletionRatio(start: string, end: string) {
+    const { data } = await supabase
+      .from('appointments')
+      .select('appointment_status')
+      .gte('created_at', start)
+      .lte('created_at', end);
 
-  const completed = data?.filter(d => d.appointment_status === 'completed').length || 0;
-  const pending = data?.filter(d => d.appointment_status === 'pending').length || 0;
-  return completed + pending > 0 ? Math.round((completed / (completed + pending)) * 100) : 0;
-}
+    const completed = data?.filter(d => d.appointment_status === 'completed').length || 0;
+    const pending = data?.filter(d => d.appointment_status === 'pending').length || 0;
+    return completed + pending > 0 ? Math.round((completed / (completed + pending)) * 100) : 0;
+  }
 
-// 🟩 CHART: Age Distribution
- async getAgeDistribution() {
-  const { data } = await supabase.from('patients').select('date_of_birth');
-  const today = new Date();
-  const buckets = { '0–18': 0, '19–35': 0, '36–50': 0, '51+': 0 };
+  // 🟩 CHART: Age Distribution
+  async getAgeDistribution() {
+    const { data } = await supabase.from('patients').select('date_of_birth');
+    const today = new Date();
+    const buckets = { '0–18': 0, '19–35': 0, '36–50': 0, '51+': 0 };
 
-  data?.forEach(p => {
-    const dob = new Date(p.date_of_birth);
-    const age = today.getFullYear() - dob.getFullYear();
-    if (age <= 18) buckets['0–18']++;
-    else if (age <= 35) buckets['19–35']++;
-    else if (age <= 50) buckets['36–50']++;
-    else buckets['51+']++;
-  });
+    data?.forEach(p => {
+      const dob = new Date(p.date_of_birth);
+      const age = today.getFullYear() - dob.getFullYear();
+      if (age <= 18) buckets['0–18']++;
+      else if (age <= 35) buckets['19–35']++;
+      else if (age <= 50) buckets['36–50']++;
+      else buckets['51+']++;
+    });
 
-  return buckets;
-}
+    return buckets;
+  }
 
-// 🟩 CHART: Gender Distribution
-// async getGenderDistribution() {
-//   const { data } = await supabase.from('patients').select('gender');
-//   const genderMap = {};
-//   data?.forEach(p => {
-//     genderMap[p.gender] = (genderMap[p.gender] || 0) + 1;
-//   });
-//   return genderMap;
-// }
+  // 🟩 CHART: Gender Distribution
+  async getGenderDistribution() {
+    const { data } = await supabase.from('patients').select('gender');
+    const genderMap: { [key: string]: number } = {};
+    data?.forEach(p => {
+      genderMap[p.gender] = (genderMap[p.gender] || 0) + 1;
+    });
+    return genderMap;
+  }
 
-// 🟩 CHART: Cancelled Rate
-async getCancelledRate(start: string, end: string) {
-  const { data } = await supabase
-    .from('appointments')
-    .select('appointment_status')
-    .gte('created_at', start)
-    .lte('created_at', end);
+  // 🟩 CHART: Cancelled Rate
+  async getCancelledRate(start: string, end: string) {
+    const { data } = await supabase
+      .from('appointments')
+      .select('appointment_status')
+      .gte('created_at', start)
+      .lte('created_at', end);
 
-  const cancelled = data?.filter(d => d.appointment_status === 'cancelled').length || 0;
-  return (cancelled / (data?.length || 1)) * 100;
-}
+    const cancelled = data?.filter(d => d.appointment_status === 'cancelled').length || 0;
+    return (cancelled / (data?.length || 1)) * 100;
+  }
 
-// 🟩 CHART: Avg Appointment Duration (Mock)
-async getAvgAppointmentDuration() {
-  return 25; // you can replace this with real logic once you track actual duration
-}
+  // 🟩 CHART: Avg Appointment Duration (Mock)
+  async getAvgAppointmentDuration() {
+    return 25; // you can replace this with real logic once you track actual duration
+  }
 
-// 🟩 CHART: Staff Workload Balance
-async getStaffWorkloadBalance() {
-  const { data: doctors } = await supabase.from('staff_members').select('staff_id').eq('role', 'doctor');
-  const { data: appts } = await supabase.from('appointments').select('doctor_id');
+  // 🟩 CHART: Staff Workload Balance
+  async getStaffWorkloadBalance() {
+    const { data: doctors } = await supabase.from('staff_members').select('staff_id').eq('role', 'doctor');
+    const { data: appts } = await supabase.from('appointments').select('doctor_id');
 
-  const docCount = doctors?.length || 1;
-  const totalAppts = appts?.length || 0;
-  const perDoctor = Math.round(totalAppts / docCount);
+    const docCount = doctors?.length || 1;
+    const totalAppts = appts?.length || 0;
+    const perDoctor = Math.round(totalAppts / docCount);
 
-  return { doctorCount: docCount, totalAppointments: totalAppts, perDoctor };
-}
+    return { doctorCount: docCount, totalAppointments: totalAppts, perDoctor };
+  }
 
 
   //#endregion
@@ -581,4 +581,49 @@ async getStaffWorkloadBalance() {
   }
 
   //#endregion
+
+  // Get slot assignments for a doctor
+  async getDoctorSlotAssignments(doctor_id: string) {
+    const { data, error } = await supabase
+      .from('doctor_slot_assignments')
+      .select('*')
+      .eq('doctor_id', doctor_id);
+    if (error) throw error;
+    return data || [];
+  }
+
+  // Get blog posts for a doctor
+  async getDoctorBlogPosts(doctor_id: string) {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('doctor_id', doctor_id)
+      .order('published_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  // Get all appointments for a doctor
+  async getAppointmentsByDoctor(doctor_id: string) {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        appointment_id,
+        appointment_date,
+        appointment_status,
+        visit_type,
+        patient:patients(full_name)
+      `)
+      .eq('doctor_id', doctor_id)
+      .order('appointment_date', { ascending: false });
+    if (error) throw error;
+    // Map patient name for easier display
+    return (data || []).map((appt: any) => ({
+      appointment_id: appt.appointment_id,
+      appointment_date: appt.appointment_date,
+      appointment_status: appt.appointment_status,
+      visit_type: appt.visit_type,
+      patient_name: appt.patient?.full_name || 'Unknown'
+    }));
+  }
 }
