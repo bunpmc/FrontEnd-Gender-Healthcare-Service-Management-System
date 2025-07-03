@@ -1,145 +1,125 @@
-<!-- support-chat.component.html -->
 <div class="ai-bot-container">
-  <!-- Chat Panel -->
   <div class="ai-chat-panel" [class.active]="showChatPanel">
-    <!-- Chat Header -->
+    <!-- Header -->
     <div class="ai-chat-header">
       <div class="header-content">
-        <div class="ai-avatar">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path
-              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-            />
+        <div class="chatbot-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="16" rx="5" fill="#111" />
+            <rect x="6" y="18" width="12" height="2.5" rx="1" fill="#111" />
           </svg>
         </div>
-        <div class="header-text">
-          <div class="title">AI Assistant</div>
-          <div class="status" [class.offline]="!isConnected">
-            <span class="status-indicator"></span>
-            {{ isConnected ? "Online" : "Reconnecting..." }}
-          </div>
-        </div>
+        <span class="header-title">{{ "AI_CHAT.TITLE" | translate }}</span>
       </div>
-
       <div class="header-actions">
         <button
           class="action-btn clear-btn"
           (click)="clearChat()"
-          title="Clear chat"
-          *ngIf="messages.length > 1"
+          [title]="'AI_CHAT.CLEAR' | translate"
+          [style.display]="showClearBtn ? '' : 'none'"
         >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M3 6h18M9 6v12m6-12v12" />
           </svg>
         </button>
-
         <button
           class="action-btn close-btn"
           (click)="toggleChat()"
-          title="Close chat"
+          [title]="'AI_CHAT.CLOSE' | translate"
         >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="#000000">
-            <path d="M18 6L6 18M6 6l12 12" />
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M6 6l12 12M6 18L18 6" />
           </svg>
         </button>
       </div>
     </div>
-
-    <!-- Chat Body -->
+    <!-- Body -->
     <div class="ai-chat-body" #chatBody>
-      <!-- Connection Status -->
-      <div class="connection-status" *ngIf="!isConnected">
-        <div class="status-message">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path
-              d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"
-            />
-          </svg>
-          Connection lost. Trying to reconnect...
-        </div>
+      <div
+        class="connection-status"
+        [style.display]="!isConnected ? '' : 'none'"
+      >
+        <span>{{ "AI_CHAT.CONNECTION_LOST" | translate }}</span>
       </div>
-
-      <!-- Chat Messages -->
+      <!-- Chỉ show một message demo (hoặc lấy message mới nhất ở TS binding ra) -->
       <div class="chat-messages">
         <div
-          *ngFor="let msg of messages; trackBy: trackByMessageId"
           [ngClass]="{
             'ai-message': true,
-            bot: msg.from === 'bot',
-            user: msg.from === 'user'
+            bot: currentMsg?.from === 'bot',
+            user: currentMsg?.from === 'user'
           }"
           class="message-wrapper"
         >
-          <!-- Bot Avatar
-          <div class="message-avatar" *ngIf="msg.from === 'bot'">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
-            </svg>
-          </div> -->
-
-          <!-- Message Content -->
           <div class="message-bubble">
-            <div class="message-content">
-              {{ msg.text }}
-            </div>
+            <div class="message-content">{{ currentMsg?.text }}</div>
             <div class="message-time">
-              {{ formatTime(msg.timestamp) }}
+              {{ formatTime(currentMsg?.timestamp) }}
             </div>
           </div>
         </div>
       </div>
-
       <!-- Typing Indicator -->
       <div class="typing-indicator" [class.visible]="isTyping">
         <div class="ai-message bot">
           <div class="message-avatar">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="#111">
               <circle cx="12" cy="12" r="3" />
               <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
             </svg>
           </div>
           <div class="typing-animation">
             <div class="typing-dots">
-              <span></span>
-              <span></span>
-              <span></span>
+              <span></span><span></span><span></span>
             </div>
-            <div class="typing-text">AI is thinking...</div>
+            <div class="typing-text">{{ "AI_CHAT.TYPING" | translate }}</div>
           </div>
         </div>
       </div>
-
-      <!-- Quick Replies -->
-      <div class="quick-replies" *ngIf="messages.length === 1 && !isTyping">
-        <div class="quick-replies-title">Quick replies:</div>
+      <!-- Quick replies, chỉ hiển thị 1 row demo, TS xử lý gán quickReplyText nếu cần -->
+      <div
+        class="quick-replies"
+        [style.display]="showQuickReplies ? '' : 'none'"
+      >
+        <div class="quick-replies-title">
+          {{ "AI_CHAT.QUICK_REPLIES_TITLE" | translate }}
+        </div>
         <div class="quick-reply-buttons">
           <button
-            *ngFor="let reply of quickReplies"
             class="quick-reply-btn"
-            (click)="sendQuickReply(reply)"
+            (click)="sendQuickReply(quickReplyText)"
           >
-            {{ reply }}
+            {{ quickReplyText }}
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Chat Input -->
+    <!-- Input -->
     <div class="ai-chat-input">
       <div class="input-container" [class.disabled]="!isConnected">
         <textarea
           #messageInput
           [(ngModel)]="message"
           (keydown)="onKeyDown($event)"
-          placeholder="Type your message..."
+          [placeholder]="'AI_CHAT.PLACEHOLDER' | translate"
           rows="1"
           [disabled]="!isConnected"
           class="message-textarea"
         ></textarea>
-
         <button
           class="send-btn"
           (click)="sendMessage()"
@@ -149,64 +129,50 @@
           <svg
             *ngIf="!isTyping"
             viewBox="0 0 24 24"
-            width="18"
-            height="18"
-            fill="currentColor"
+            width="20"
+            height="20"
+            fill="#fff"
           >
             <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
           </svg>
-
           <div *ngIf="isTyping" class="loading-spinner">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#111">
               <circle cx="12" cy="12" r="3" />
             </svg>
           </div>
         </button>
       </div>
-
-      <div class="input-hint" *ngIf="isConnected">
-        Press Enter to send • Shift + Enter for new line
+      <div class="input-hint" [style.display]="isConnected ? '' : 'none'">
+        {{ "AI_CHAT.INPUT_HINT" | translate }}
       </div>
     </div>
   </div>
-
-  <!-- Chat Bot Icon -->
+  <!-- Bot Icon -->
   <div
     class="ai-bot-icon"
     (click)="toggleChat()"
     [class.active]="showChatPanel"
-    [class.has-unread]="unreadCount > 0"
   >
     <div class="icon-inner">
       <svg
         *ngIf="!showChatPanel"
+        width="30"
+        height="30"
         viewBox="0 0 24 24"
-        width="28"
-        height="28"
-        fill="currentColor"
+        fill="none"
       >
-        <path
-          d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
-        />
+        <rect x="2" y="2" width="20" height="16" rx="5" fill="#111" />
+        <rect x="6" y="18" width="12" height="2.5" rx="1" fill="#111" />
       </svg>
-
       <svg
         *ngIf="showChatPanel"
+        width="30"
+        height="30"
         viewBox="0 0 24 24"
-        width="28"
-        height="28"
-        fill="currentColor"
+        fill="none"
       >
-        <path d="M18 6L6 18M6 6l12 12" />
+        <path d="M18 6L6 18M6 6l12 12" stroke="#111" stroke-width="2" />
       </svg>
     </div>
-
-    <!-- Unread Badge -->
-    <div class="unread-badge" *ngIf="unreadCount > 0 && !showChatPanel">
-      {{ unreadCount > 9 ? "9+" : unreadCount }}
-    </div>
-
-    <!-- Pulse Effect -->
-    <div class="pulse-ring" *ngIf="unreadCount > 0 && !showChatPanel"></div>
   </div>
 </div>

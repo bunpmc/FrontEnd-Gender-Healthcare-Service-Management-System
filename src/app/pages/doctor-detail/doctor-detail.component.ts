@@ -4,11 +4,12 @@ import { DoctorDetail } from '../../models/doctor.model';
 import { UserService } from '../../Services/user.service';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '../../Services/Breadcrumb.service';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-doctor-detail',
@@ -21,9 +22,10 @@ import { Subscription } from 'rxjs';
     RouterLink,
     DatePipe,
     BreadcrumbsComponent,
+    TranslateModule,
+    UpperCasePipe,
   ],
   templateUrl: './doctor-detail.component.html',
-  // styleUrl: './doctor-detail.component.css',
 })
 export class DoctorDetailComponent implements OnInit, OnDestroy {
   doctor = signal<DoctorDetail | null>(null);
@@ -42,8 +44,7 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
   fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
 
   ngOnInit(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // scroll top khi vào page
-
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.doctorId = this.route.snapshot.paramMap.get('id');
     if (!this.doctorId) {
       this.errorMsg.set('Doctor not found');
@@ -56,12 +57,10 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
   fetchDoctor(doctor_id: string): void {
     this.loading.set(true);
     this.errorMsg.set('');
-
     this.userService.getDoctorById(doctor_id).subscribe({
       next: (doctor) => {
         this.doctor.set(doctor);
         this.loading.set(false);
-
         const breadcrumbPath = `/doctor/${doctor_id}`;
         const label = doctor?.staff_members?.full_name || 'Doctor Detail';
         this.breadcrumbService.setLabel(breadcrumbPath, label);
@@ -74,7 +73,6 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Clear label khi rời trang detail
     if (this.doctorId) {
       const breadcrumbPath = `/doctor/${this.doctorId}`;
       this.breadcrumbService.clearLabel(breadcrumbPath);
@@ -89,7 +87,6 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
       : link;
   }
 
-  // --- GETTERS ---
   get doctorName(): string {
     return this.doctor()?.staff_members?.full_name || 'Dr. [unknown]';
   }
@@ -126,7 +123,6 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
     return this.doctor()?.blogs ?? [];
   }
 
-  // --- UI/UX Handlers ---
   setTab(tab: string) {
     this.activeTab = tab;
     window.scrollTo({ top: 0, behavior: 'smooth' });

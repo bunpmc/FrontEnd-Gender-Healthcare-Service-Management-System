@@ -7,26 +7,29 @@
   <div class="max-w-7xl mx-auto py-12 px-6">
     <!-- Tiêu đề -->
     <h2 class="text-4xl font-bold text-center mb-4 text-[#1e3a8a]">
-      Our Medical Team
+      {{ "DOCTOR.HEADLINE" | translate }}
     </h2>
     <p
       class="text-center text-gray-500 max-w-2xl mx-auto mb-10 text-lg leading-relaxed"
     >
-      Meet our team of experienced and compassionate doctors, here to provide
-      exceptional care tailored to your needs.
+      {{ "DOCTOR.DESCRIPTION" | translate }}
     </p>
 
     <!-- Filter + List -->
     <div class="flex flex-col md:flex-row gap-8 mb-12">
-      <!-- 👇 Toggle filter button (mobile only) -->
+      <!-- Toggle filter button (mobile only) -->
       <button
         class="md:hidden mb-4 px-4 py-2 bg-blue-600 text-white rounded-md shadow transition hover:bg-blue-700"
         (click)="showFilter = !showFilter"
       >
-        {{ showFilter ? "Hide Filters" : "Show Filters" }}
+        {{
+          showFilter
+            ? ("DOCTOR.FILTER.HIDE" | translate)
+            : ("DOCTOR.FILTER.SHOW" | translate)
+        }}
       </button>
 
-      <!-- 👇 Filter Sidebar -->
+      <!-- Filter Sidebar -->
       <div
         class="md:w-1/4 w-full space-y-4 bg-white px-6 py-5 rounded-xl shadow-md backdrop-blur-sm transition-all duration-500 ease-in-out"
         [ngClass]="{
@@ -37,7 +40,7 @@
       >
         <input
           type="text"
-          placeholder="Search doctors..."
+          [placeholder]="'DOCTOR.FILTER.SEARCH_PLACEHOLDER' | translate"
           class="w-full px-4 py-2 rounded-xl bg-gray-50 shadow-inner focus:ring-2 ring-blue-400 focus:scale-[1.02] transition-all duration-300"
           (input)="onSearch($event)"
           [value]="searchValue"
@@ -52,7 +55,7 @@
           <option [value]="spec">
             {{
               spec === "All"
-                ? "All Specialties"
+                ? ("DOCTOR.FILTER.ALL_SPECIALTIES" | translate)
                 : (spec.replaceAll("_", " ") | titlecase)
             }}
           </option>
@@ -66,7 +69,11 @@
         >
           @for (g of genders; track g) {
           <option [value]="g">
-            {{ g === "All" ? "All Genders" : (g | titlecase) }}
+            {{
+              g === "All"
+                ? ("DOCTOR.FILTER.ALL_GENDERS" | translate)
+                : ("DOCTOR.GENDER." + g | translate)
+            }}
           </option>
           }
         </select>
@@ -118,14 +125,14 @@
               <span
                 class="px-3 py-1 rounded-full font-medium text-white capitalize tracking-wide"
                 [ngClass]="{
-                  'bg-blue-500': doc.staff_members.gender === 'male',
-                  'bg-pink-500': doc.staff_members.gender === 'female',
+                  'bg-blue-500': doc.staff_members.gender === 'Male',
+                  'bg-pink-500': doc.staff_members.gender === 'Female',
                   'bg-gray-600':
-                    doc.staff_members.gender !== 'male' &&
-                    doc.staff_members.gender !== 'female'
+                    doc.staff_members.gender !== 'Male' &&
+                    doc.staff_members.gender !== 'Female'
                 }"
               >
-                {{ doc.staff_members.gender | titlecase }}
+                {{ "DOCTOR.GENDER." + doc.staff_members.gender | translate }}
               </span>
               <span class="bg-white/20 px-3 py-1 rounded-full capitalize">
                 {{ doc.department.replaceAll("_", " ") | titlecase }}
@@ -135,13 +142,15 @@
         </a>
         } } @else {
         <div class="col-span-3 text-center py-20">
-          <p class="text-gray-400 text-lg">No doctors found</p>
+          <p class="text-gray-400 text-lg">
+            {{ "DOCTOR.NOT_FOUND" | translate }}
+          </p>
         </div>
         }
       </div>
     </div>
 
-    <!-- 🎨 Pagination - Simple Luxury -->
+    <!-- Pagination -->
     <div
       class="flex justify-center items-center gap-1 mt-10 flex-wrap text-sm text-gray-700"
     >
@@ -165,7 +174,7 @@
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        Prev
+        {{ "DOCTOR.PAGINATION.PREV" | translate }}
       </button>
       <!-- Page Numbers -->
       @for (i of pageArray; track i) {
@@ -185,7 +194,7 @@
         [disabled]="page === maxPage"
         class="px-3 py-1 rounded-md hover:bg-gray-100 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
       >
-        Next
+        {{ "DOCTOR.PAGINATION.NEXT" | translate }}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="w-4 h-4 inline-block"

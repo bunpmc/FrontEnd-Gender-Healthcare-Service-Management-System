@@ -11,7 +11,11 @@ import {
   type MedicalService,
   type ServiceDetail,
 } from '../models/service.model';
-import { DoctorBooking, type TimeSlot } from '../models/booking.model';
+import {
+  DoctorBooking,
+  ServiceBooking,
+  type TimeSlot,
+} from '../models/booking.model';
 
 // ================== SERVICE DECORATOR ==================
 @Injectable({
@@ -121,6 +125,15 @@ export class UserService {
     });
   }
 
+  fetchDoctor(): Observable<DoctorBooking[]> {
+    return this.http.get<DoctorBooking[]>(
+      `${environment.apiEndpoint}/fetch-service`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+  }
+
   getDoctorById(id: string): Observable<DoctorDetail> {
     const params = new HttpParams().set('doctor_id', id);
     return this.http.get<DoctorDetail>(
@@ -167,6 +180,14 @@ export class UserService {
       `${environment.apiEndpoint}/fetch-service-id`,
       {
         params,
+        headers: this.getHeaders(),
+      }
+    );
+  }
+  fetchService(): Observable<ServiceBooking[]> {
+    return this.http.get<ServiceBooking[]>(
+      `${environment.apiEndpoint}/fetch-service`,
+      {
         headers: this.getHeaders(),
       }
     );

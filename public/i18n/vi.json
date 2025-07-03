@@ -1,0 +1,184 @@
+{
+  "CONTACT": {
+    "EMAIL": "Gendercare123@gmail.com",
+    "PHONE": "+84 909 157 997",
+    "HEADLINE": "Hãy để chúng tôi chăm sóc bạn",
+    "PHONE_TITLE": "Gọi cho chúng tôi",
+    "EMAIL_TITLE": "Gửi email cho chúng tôi"
+  },
+  "NAV": {
+    "HOME": "Trang chủ",
+    "FORM": "Biểu mẫu",
+    "TRACKER": "Theo dõi",
+    "SERVICES": "Dịch vụ",
+    "DOCTORS": "Bác sĩ",
+    "BLOGS": "Tin tức"
+  },
+  "USER": {
+    "DASHBOARD": "Bảng điều khiển",
+    "LOGOUT": "Đăng xuất",
+    "LOGIN": "Đăng nhập",
+    "REGISTER": "Đăng ký",
+    "BOOK_NOW": "Đặt lịch ngay"
+  },
+  "FOOTER": {
+    "TITLE": "Chân trang",
+    "SLOGAN": "Chúng tôi tận tâm cung cấp dịch vụ y tế tận tình và giải pháp chuyên nghiệp cho mọi giai đoạn cuộc đời bạn.",
+    "ALL_RIGHTS": "Đã đăng ký bản quyền.",
+    "SOLUTIONS": {
+      "TITLE": "Giải pháp",
+      "MARKETING": "Tiếp thị",
+      "EVENTS": "Sự kiện",
+      "COMMERCE": "Thương mại",
+      "INSIGHTS": "Phân tích"
+    },
+    "SUPPORT": {
+      "TITLE": "Hỗ trợ",
+      "PRICING": "Bảng giá",
+      "DOCS": "Tài liệu",
+      "GUIDES": "Hướng dẫn"
+    },
+    "CLINIC": {
+      "TITLE": "Phòng khám",
+      "ABOUT": "Giới thiệu",
+      "BLOG": "Tin tức",
+      "DOCTORS": "Bác sĩ",
+      "PARTNERS": "Đối tác"
+    },
+    "LEGAL": {
+      "TITLE": "Pháp lý",
+      "CLAIM": "Khiếu nại",
+      "PRIVACY": "Chính sách",
+      "TERMS": "Điều khoản"
+    }
+  },
+  "HERO": {
+    "TITLE": "Phòng khám sức khỏe giới tính tư nhân",
+    "DESC": "Tại GenCare, chúng tôi luôn đồng hành và hỗ trợ bạn trên mọi hành trình. Phòng khám của chúng tôi là nơi an toàn, hòa nhập cho tất cả mọi người cần chăm sóc sức khỏe giới tính chuyên biệt.",
+    "CTA": {
+      "CONTACT": "Liên hệ",
+      "SERVICES": "Dịch vụ của chúng tôi"
+    }
+  },
+  "ADDRESS": {
+    "HEADLINE": "Đến thăm phòng khám của chúng tôi",
+    "TITLE": "Bạn có thể tìm chúng tôi tại",
+    "ADDRESS": "12 Chu Văn An, Thủ Đức, TP.HCM",
+    "OPEN_TITLE": "Giờ làm việc",
+    "OPEN": "Thứ 2 – Thứ 7: 7:30 – 17:30"
+  },
+  "SOCIALS": {
+    "HEADLINE": "Kết nối với chúng tôi",
+    "FACEBOOK_TITLE": "Facebook",
+    "FACEBOOK": "Trang Facebook GenderCare",
+    "YOUTUBE_TITLE": "Youtube",
+    "YOUTUBE": "Kênh GenderCare"
+  },
+  "VIDEO": {
+    "NOT_SUPPORTED": "Trình duyệt của bạn không hỗ trợ video này."
+  },
+  "SERVICE": {
+    "TITLE": "Chăm sóc toàn diện cho mọi nhu cầu sức khỏe",
+    "DESC": "Chúng tôi cam kết mang lại môi trường an toàn, hòa nhập và hỗ trợ cho tất cả mọi người. Đội ngũ y tế giàu kinh nghiệm cung cấp dịch vụ chăm sóc toàn diện, bảo mật và không phán xét, phù hợp với nhu cầu của bạn bất kể bản dạng giới hay xu hướng tính dục.",
+    "PRICE": "Bảng giá dịch vụ"
+  },
+  "DOCTOR": {
+    "HEADLINE": "Đội ngũ y bác sĩ",
+    "VIEW_ALL": "Xem tất cả",
+    "DESCRIPTION": "Gặp gỡ đội ngũ bác sĩ giàu kinh nghiệm và tận tâm của chúng tôi, luôn sẵn sàng chăm sóc sức khỏe cho bạn.",
+    "YEARS_EXP": "năm kinh nghiệm",
+    "TABS": {
+      "ABOUT": "Giới thiệu",
+      "EDUCATION": "Học vấn",
+      "CERTIFICATIONS": "Chứng chỉ",
+      "LICENSE": "Giấy phép hành nghề"
+    },
+    "ABOUT": {
+      "ABOUT": "Giới thiệu",
+      "EXPERIENCE": "Kinh nghiệm",
+      "LANGUAGES": "Ngôn ngữ"
+    },
+    "EDUCATION": {
+      "TITLE": "Học vấn",
+      "NO_EDUCATION": "Chưa có thông tin học vấn."
+    },
+    "CERTIFICATIONS": {
+      "TITLE": "Chứng chỉ",
+      "NO_CERT": "Chưa có thông tin chứng chỉ."
+    },
+    "LICENSE": {
+      "TITLE": "GIẤY PHÉP HÀNH NGHỀ Y",
+      "FULL_NAME": "Họ tên",
+      "LICENSE_NO": "Số giấy phép",
+      "SPECIALTY": "Chuyên khoa"
+    },
+    "FILTER": {
+      "SHOW": "Hiện bộ lọc",
+      "HIDE": "Ẩn bộ lọc",
+      "SEARCH_PLACEHOLDER": "Tìm kiếm bác sĩ...",
+      "SPECIALTY_LABEL": "Chuyên khoa",
+      "GENDER_LABEL": "Giới tính",
+      "ALL_SPECIALTIES": "Tất cả chuyên khoa",
+      "ALL_GENDERS": "Tất cả giới tính"
+    },
+    "GENDER": {
+      "MALE": "Nam",
+      "FEMALE": "Nữ",
+      "OTHER": "Khác"
+    },
+    "DEPARTMENT": "Khoa",
+    "LOADING": "Đang tải danh sách bác sĩ...",
+    "NOT_FOUND": "Không tìm thấy bác sĩ nào",
+    "PAGINATION": {
+      "PREV": "Trước",
+      "NEXT": "Tiếp"
+    },
+    "PROFILE": {
+      "VIEW_PROFILE": "Xem hồ sơ",
+      "SPECIALTY": "Chuyên khoa",
+      "BOOK": "Đặt lịch khám"
+    },
+    "BLOGS_BY_DOCTOR": "Bài viết nổi bật của bác sĩ {{doctor}}",
+    "NO_BLOGS": "Chưa có bài viết nào của bác sĩ này."
+  },
+  "BLOG": {
+    "HEADLINE": "Khám phá các bài viết mới nhất về sức khỏe & chăm sóc",
+    "EXPLORE": "Xem thêm",
+    "LOADING": "Đang tải các bài viết...",
+    "RETRY": "Tải lại",
+    "NO_DATA": "Chưa có bài viết nào.",
+    "READ_MORE": "Xem chi tiết →",
+    "LOAD_ERROR": "Không tải được bài viết. Vui lòng thử lại."
+  },
+  "AI_CHAT": {
+    "TITLE": "Trò chuyện AI",
+    "BOT_NAME": "Trợ lý AI",
+    "PLACEHOLDER": "Nhập tin nhắn của bạn...",
+    "SEND": "Gửi",
+    "CLEAR": "Xóa cuộc trò chuyện",
+    "CLOSE": "Đóng cửa sổ",
+    "CONNECTION_LOST": "Mất kết nối. Đang cố gắng kết nối lại...",
+    "QUICK_REPLIES_TITLE": "Gợi ý nhanh:",
+    "QUICK_REPLIES": [
+      "Tôi có thể giúp gì cho bạn?",
+      "Tìm bác sĩ phụ khoa cho tôi",
+      "Tôi cần bác sĩ nội tiết",
+      "Hiện danh sách bác sĩ",
+      "Tôi cần hỗ trợ kỹ thuật"
+    ],
+    "TYPING": "AI đang suy nghĩ...",
+    "WELCOME": "Xin chào! 👋 Tôi là trợ lý sức khỏe của bạn. Tôi có thể giúp bạn tìm bác sĩ, trả lời các câu hỏi sức khỏe và hỗ trợ thêm. Bạn cần tôi giúp gì hôm nay?",
+    "INPUT_HINT": "Nhấn Enter để gửi • Shift + Enter để xuống dòng",
+    "ERROR_0": "Mất kết nối. Đang thử lại... Vui lòng kiểm tra server.",
+    "ERROR_500": "Lỗi server. Vui lòng thử lại sau.",
+    "ERROR_429": "Quá nhiều yêu cầu. Vui lòng chờ một chút.",
+    "ERROR_503": "Dịch vụ tạm thời không khả dụng. Hệ thống đang tải, vui lòng thử lại sau.",
+    "ERROR_404": "Không tìm thấy dịch vụ chat. Vui lòng kiểm tra lại server.",
+    "ERROR_DEFAULT": "Có lỗi xảy ra. Vui lòng thử lại.",
+    "RECOMMEND_SUMMARY": "Tôi đã tìm thấy {{count}} bác sĩ có thể phù hợp với bạn. Bạn có thể liên hệ trực tiếp hoặc hỏi tôi để nhận tư vấn cụ thể hơn!",
+    "COPY_SUCCESS": "Đã sao chép email liên hệ",
+    "COPY_FAIL": "Sao chép thông tin thất bại",
+    "DOCTOR_LIST_TITLE": "Danh sách bác sĩ gợi ý",
+    "MESSAGE_TIME_FORMAT": "HH:mm"
+  }
+}

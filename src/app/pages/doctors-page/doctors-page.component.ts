@@ -7,6 +7,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core'; // Import TranslateService
 
 @Component({
   selector: 'app-doctors-page',
@@ -19,6 +20,7 @@ import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.c
     FormsModule,
     TitleCasePipe,
     BreadcrumbsComponent,
+    TranslateModule,
   ],
   templateUrl: './doctors-page.component.html',
   styleUrls: ['./doctors-page.component.css'],
@@ -33,7 +35,7 @@ export class DoctorsPageComponent implements OnInit {
   selectedSpecialty: string = 'All';
   selectedGender: string = 'All';
   specialties: string[] = ['All'];
-  genders: string[] = ['All', 'male', 'female', 'other'];
+  genders: string[] = ['All', 'MALE', 'FEMALE', 'OTHER'];
 
   // Pagination state
   page = 1;
@@ -43,7 +45,10 @@ export class DoctorsPageComponent implements OnInit {
   showFilter = false;
   isDesktop: boolean = window.innerWidth >= 768;
 
+  fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
+
   private userService = inject(UserService);
+  private translate = inject(TranslateService);
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -54,6 +59,17 @@ export class DoctorsPageComponent implements OnInit {
     this.loading = true;
     this.userService.getDoctors('', '', '').subscribe({
       next: (data) => {
+        // Chuẩn hóa lại gender cho từng staff_members
+        data.forEach((doc: any) => {
+          console.log(doc);
+          if (doc.staff_members?.gender) {
+            let g = doc.staff_members.gender.toLowerCase().trim();
+            if (g === 'male' || g === 'nam') doc.staff_members.gender = 'MALE';
+            else if (g === 'female' || g === 'nữ')
+              doc.staff_members.gender = 'FEMALE';
+            else doc.staff_members.gender = 'OTHER';
+          }
+        });
         this.allDoctors = data;
         const uniqueSpecialties = Array.from(
           new Set(data.map((doc) => doc.speciality).filter(Boolean))
@@ -64,7 +80,10 @@ export class DoctorsPageComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        alert('Không thể tải danh sách bác sĩ');
+        // Dùng translate để báo lỗi đa ngôn ngữ
+        this.translate.get('DOCTOR.LOAD_ERROR').subscribe((res) => {
+          alert(res || 'Không thể tải danh sách bác sĩ');
+        });
         this.loading = false;
       },
     });
@@ -75,7 +94,6 @@ export class DoctorsPageComponent implements OnInit {
     this.isDesktop = window.innerWidth >= 768;
   }
 
-  fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
   getImageUrl(link: string | null | undefined): string {
     if (!link) return this.fallbackImage;
     return link.includes('//doctor')

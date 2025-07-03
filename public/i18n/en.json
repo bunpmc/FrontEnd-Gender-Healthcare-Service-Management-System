@@ -1,0 +1,184 @@
+{
+  "CONTACT": {
+    "EMAIL": "Gendercare123@gmail.com",
+    "PHONE": "+84 909 157 997",
+    "HEADLINE": "Let us take care of you",
+    "PHONE_TITLE": "Give us a call",
+    "EMAIL_TITLE": "Send us an email"
+  },
+  "NAV": {
+    "HOME": "Home",
+    "FORM": "Form",
+    "TRACKER": "Tracker",
+    "SERVICES": "Services",
+    "DOCTORS": "Doctors",
+    "BLOGS": "Blogs"
+  },
+  "USER": {
+    "DASHBOARD": "Dashboard",
+    "LOGOUT": "Logout",
+    "LOGIN": "Login",
+    "REGISTER": "Register",
+    "BOOK_NOW": "Book now"
+  },
+  "FOOTER": {
+    "TITLE": "Footer",
+    "SLOGAN": "We are dedicated to providing compassionate care and expert medical solutions for every stage of your life.",
+    "ALL_RIGHTS": "All rights reserved.",
+    "SOLUTIONS": {
+      "TITLE": "Solutions",
+      "MARKETING": "Marketing",
+      "EVENTS": "Events",
+      "COMMERCE": "Commerce",
+      "INSIGHTS": "Insights"
+    },
+    "SUPPORT": {
+      "TITLE": "Support",
+      "PRICING": "Pricing",
+      "DOCS": "Documentation",
+      "GUIDES": "Guides"
+    },
+    "CLINIC": {
+      "TITLE": "Clinic",
+      "ABOUT": "About",
+      "BLOG": "Blog",
+      "DOCTORS": "Doctors",
+      "PARTNERS": "Partners"
+    },
+    "LEGAL": {
+      "TITLE": "Legal",
+      "CLAIM": "Claim",
+      "PRIVACY": "Privacy",
+      "TERMS": "Terms"
+    }
+  },
+  "HERO": {
+    "TITLE": "A Gender healthcare private clinic",
+    "DESC": "At GenCare, we’re all about supporting you through every stage of your journey. Our clinic offers a safe, inclusive space for everyone seeking specialized gender healthcare.",
+    "CTA": {
+      "CONTACT": "Contact Us",
+      "SERVICES": "Our Services"
+    }
+  },
+  "ADDRESS": {
+    "HEADLINE": "Visit our clinic",
+    "TITLE": "You can find us at",
+    "ADDRESS": "12 Chu Van An street, Thu Duc, HCMC",
+    "OPEN_TITLE": "We’re open",
+    "OPEN": "Monday – Saturday: 7:30 AM – 5:30 PM"
+  },
+  "SOCIALS": {
+    "HEADLINE": "Connected with us",
+    "FACEBOOK_TITLE": "Facebook",
+    "FACEBOOK": "GenderCare Facebook page",
+    "YOUTUBE_TITLE": "Youtube",
+    "YOUTUBE": "GenderCare Channel"
+  },
+  "VIDEO": {
+    "NOT_SUPPORTED": "Your browser does not support video."
+  },
+  "SERVICE": {
+    "TITLE": "Comprehensive care to meet all your health needs",
+    "DESC": "We are dedicated to providing a safe, inclusive, and supportive environment for everyone. Our experienced healthcare professionals offer comprehensive, confidential, and non-judgmental care tailored to your unique needs, regardless of your gender identity or sexual orientation.",
+    "PRICE": "Services Price"
+  },
+  "DOCTOR": {
+    "HEADLINE": "Our Medical Team",
+    "VIEW_ALL": "View All",
+    "DESCRIPTION": "Meet our team of experienced and compassionate doctors, here to provide exceptional care tailored to your needs.",
+    "YEARS_EXP": "years exp",
+    "TABS": {
+      "ABOUT": "About",
+      "EDUCATION": "Education",
+      "CERTIFICATIONS": "Certifications",
+      "LICENSE": "Medical License"
+    },
+    "ABOUT": {
+      "ABOUT": "About",
+      "EXPERIENCE": "Experience",
+      "LANGUAGES": "Languages"
+    },
+    "EDUCATION": {
+      "TITLE": "Education",
+      "NO_EDUCATION": "No education info available."
+    },
+    "CERTIFICATIONS": {
+      "TITLE": "Certifications",
+      "NO_CERT": "No certifications info available."
+    },
+    "LICENSE": {
+      "TITLE": "MEDICAL PRACTICE LICENSE",
+      "FULL_NAME": "Full name",
+      "LICENSE_NO": "License No.",
+      "SPECIALTY": "Specialty"
+    },
+    "FILTER": {
+      "SHOW": "Show Filters",
+      "HIDE": "Hide Filters",
+      "SEARCH_PLACEHOLDER": "Search doctors...",
+      "SPECIALTY_LABEL": "Specialty",
+      "GENDER_LABEL": "Gender",
+      "ALL_SPECIALTIES": "All Specialties",
+      "ALL_GENDERS": "All Genders"
+    },
+    "GENDER": {
+      "MALE": "Male",
+      "FEMALE": "Female",
+      "OTHER": "Other"
+    },
+    "DEPARTMENT": "Department",
+    "LOADING": "Loading doctors...",
+    "NOT_FOUND": "No doctors found",
+    "PAGINATION": {
+      "PREV": "Prev",
+      "NEXT": "Next"
+    },
+    "PROFILE": {
+      "VIEW_PROFILE": "View Profile",
+      "SPECIALTY": "Specialty",
+      "BOOK": "Book appointment"
+    },
+    "BLOGS_BY_DOCTOR": "Featured articles by Dr. {{doctor}}",
+    "NO_BLOGS": "No articles by this doctor yet."
+  },
+  "BLOG": {
+    "HEADLINE": "Browse our latest blogs on healthcare & wellness",
+    "EXPLORE": "Explore More",
+    "LOADING": "Loading latest blogs...",
+    "RETRY": "Retry",
+    "NO_DATA": "No blogs available at the moment.",
+    "READ_MORE": "Read more →",
+    "LOAD_ERROR": "Unable to load latest blogs. Please try again."
+  },
+  "AI_CHAT": {
+    "TITLE": "AI Chat",
+    "BOT_NAME": "AI Assistant",
+    "PLACEHOLDER": "Type your message...",
+    "SEND": "Send",
+    "CLEAR": "Clear chat",
+    "CLOSE": "Close chat",
+    "CONNECTION_LOST": "Connection lost. Trying to reconnect...",
+    "QUICK_REPLIES_TITLE": "Quick replies:",
+    "QUICK_REPLIES": [
+      "How can I help you?",
+      "Find me a gynecologist",
+      "I need a hormone specialist",
+      "Show me available doctors",
+      "I need technical support"
+    ],
+    "TYPING": "AI is thinking...",
+    "WELCOME": "Hello! 👋 I'm your healthcare assistant. I can help you find doctors, answer health questions, and provide support. How can I help you today?",
+    "INPUT_HINT": "Press Enter to send • Shift + Enter for new line",
+    "ERROR_0": "Connection lost. Trying to reconnect... Please check if the server is running.",
+    "ERROR_500": "Server error. Please try again in a moment.",
+    "ERROR_429": "Too many requests. Please wait a moment.",
+    "ERROR_503": "Service temporarily unavailable. The system is still loading, please try again in a few moments.",
+    "ERROR_404": "Chat service not found. Please check if the server is running properly.",
+    "ERROR_DEFAULT": "Something went wrong. Please try again.",
+    "RECOMMEND_SUMMARY": "I found {{count}} doctor(s) that might help you. You can contact them directly using the information provided above, or ask me for more specific recommendations!",
+    "COPY_SUCCESS": "Contact email copied to clipboard",
+    "COPY_FAIL": "Failed to copy contact info",
+    "DOCTOR_LIST_TITLE": "Doctor Recommendations",
+    "MESSAGE_TIME_FORMAT": "HH:mm"
+  }
+}

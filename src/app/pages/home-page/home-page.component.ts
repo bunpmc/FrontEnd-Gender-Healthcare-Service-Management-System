@@ -1,25 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core'; // <-- Thêm dòng này!
+
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { SplideComponent } from '../../components/splide/splide.component';
 import { SupportChatComponent } from '../../components/support-chat/support-chat.component';
-import { UserService } from '../../Services/user.service'; // Adjust path as needed
-import { Blog } from '../../models/blog.model';
-import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component'; // Adjust path as needed
-
-// Interface để map dữ liệu từ API sang format hiện tại
-interface BlogDisplay {
-  id: string;
-  title: string;
-  desc: string;
-  img: string;
-  author: string;
-  createdAt: string;
-  tags: string[];
-  category: string;
-}
+import { UserService } from '../../Services/user.service';
+import { Blog, BlogDisplay } from '../../models/blog.model';
 
 @Component({
   selector: 'app-home-page',
@@ -31,6 +20,7 @@ interface BlogDisplay {
     SplideComponent,
     RouterLink,
     SupportChatComponent,
+    TranslateModule, // <-- Thêm vào đây!
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
@@ -53,11 +43,8 @@ export class HomePageComponent implements OnInit {
 
     this.userService.getBlogs().subscribe({
       next: (blogs: Blog[]) => {
-        // Map and get latest 2 blogs
-        const mappedBlogs = blogs.map((blog) => this.mapBlogToDisplay(blog));
-
-        // Sort by creation date (newest first) and take first 2
-        this.latestBlogs = mappedBlogs
+        this.latestBlogs = blogs
+          .map((blog) => this.mapBlogToDisplay(blog))
           .sort(
             (a, b) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -68,20 +55,19 @@ export class HomePageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading latest blogs:', error);
-        this.blogError = 'Unable to load latest blogs. Please try again.';
+        this.blogError = 'BLOG.LOAD_ERROR'; // Key dùng để translate trong template!
         this.isLoadingBlogs = false;
       },
     });
   }
 
   private mapBlogToDisplay(blog: Blog): BlogDisplay {
-    // Safely extract tags array
     const tagsArray = this.extractTags(blog.blog_tags);
 
     return {
       id: blog.blog_id,
       title: blog.blog_title,
-      desc: this.truncateDescription(blog.excerpt, 150), // Truncate for homepage
+      desc: this.truncateDescription(blog.excerpt, 150),
       img: blog.image_link || '',
       author: blog.doctor_details.full_name,
       createdAt: blog.created_at,
@@ -92,23 +78,12 @@ export class HomePageComponent implements OnInit {
 
   private extractTags(blogTags: any): string[] {
     if (!blogTags) return [];
-
-    if (Array.isArray(blogTags.tags)) {
-      return blogTags.tags;
-    }
-
-    if (Array.isArray(blogTags)) {
-      return blogTags;
-    }
-
-    if (typeof blogTags === 'string') {
+    if (Array.isArray(blogTags.tags)) return blogTags.tags;
+    if (Array.isArray(blogTags)) return blogTags;
+    if (typeof blogTags === 'string')
       return blogTags.split(',').map((tag) => tag.trim());
-    }
-
-    if (typeof blogTags.tags === 'string') {
+    if (typeof blogTags.tags === 'string')
       return blogTags.tags.split(',').map((tag: string) => tag.trim());
-    }
-
     return [];
   }
 
@@ -116,7 +91,6 @@ export class HomePageComponent implements OnInit {
     if (!Array.isArray(tags) || tags.length === 0) {
       return 'Community';
     }
-
     const tagMap: { [key: string]: string } = {
       transgender: 'Gender Stories',
       'hormone therapy': 'Gender Stories',
@@ -125,14 +99,12 @@ export class HomePageComponent implements OnInit {
       legal: 'Legal',
       education: 'Education',
     };
-
     for (const tag of tags) {
       if (typeof tag === 'string') {
         const category = tagMap[tag.toLowerCase()];
         if (category) return category;
       }
     }
-
     return 'Community';
   }
 
