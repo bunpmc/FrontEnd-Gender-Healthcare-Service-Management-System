@@ -6,6 +6,7 @@ import { AppointmentManagementComponent } from './admin/appointment-management/a
 import { ServiceManagementComponent } from './admin/service-management/service-management.component';
 import { AnalyticManagementComponent } from './admin/analytic-management/analytic-management.component';
 import { DoctorDashboardComponent } from './doctor/doctor-dashboard/doctor-dashboard.component';
+import { doctorDashboardRoutes } from './doctor/doctor-dashboard/doctor-dashboard.routes';
 
 export const routes: Routes = [
   {
@@ -34,7 +35,8 @@ export const routes: Routes = [
   },
   {
     path: 'doctor/dashboard',
-    component: DoctorDashboardComponent
+    component: DoctorDashboardComponent,
+    children: doctorDashboardRoutes
   },
   {
     path: '',

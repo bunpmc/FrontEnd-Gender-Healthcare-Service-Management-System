@@ -5,6 +5,7 @@ import { DoctorPatientsComponent } from './patients/patients.component';
 import { BlogPostsComponent } from './blog-posts/blog-posts.component';
 import { SlotAssignmentComponent } from './slots/slots.component';
 import { DoctorAppointmentsComponent } from './appointments/appointments.component';
+import { ActivityLogsComponent } from './activity-logs/activity-logs.component';
 
 export const doctorDashboardRoutes: Routes = [
   { path: 'profile', component: DoctorProfileComponent },
@@ -13,5 +14,6 @@ export const doctorDashboardRoutes: Routes = [
   { path: 'blog-posts', component: BlogPostsComponent },
   { path: 'slots', component: SlotAssignmentComponent },
   { path: 'appointments', component: DoctorAppointmentsComponent },
+  { path: 'activity-logs', component: ActivityLogsComponent },
   { path: '', redirectTo: 'profile', pathMatch: 'full' }
 ];
