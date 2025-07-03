@@ -1,0 +1,56 @@
+<div class="grid grid-cols-2 gap-6">
+  <!-- Age Distribution Pie Chart -->
+  <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+    <h2 class="font-semibold mb-2">Age Distribution</h2>
+    <canvas baseChart
+      [data]="ageDistChartData"
+      [type]="'pie'"
+      [options]="pieChartOptions"
+      [legend]="true">
+    </canvas>
+  </div>
+
+  <!-- Gender Distribution Pie Chart -->
+  <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+    <h2 class="font-semibold mb-2">Gender Distribution</h2>
+    <canvas baseChart
+      [data]="genderDistChartData"
+      [type]="'pie'"
+      [options]="pieChartOptions"
+      [legend]="true">
+    </canvas>
+  </div>
+
+  <!-- Cancelled Rate Progress -->
+  <div class="col-span-2 flex flex-col md:flex-row gap-6">
+    <div class="flex-1 bg-white rounded-xl shadow p-4 flex flex-col items-center">
+      <h2 class="font-semibold mb-2">Cancelled Rate</h2>
+      <div class="w-full flex flex-col items-center">
+        <div class="w-full bg-green-200 rounded-full h-4 mb-2">
+          <div class="bg-red-400 h-4 rounded-full" [style.width]="cancelRate + '%'" style="transition: width 0.5s;"></div>
+        </div>
+        <span class="text-lg font-bold text-red-600">{{ cancelRate | number:'1.0-2' }}%</span>
+      </div>
+    </div>
+    <!-- Avg Appointment Duration Progress -->
+    <div class="flex-1 bg-white rounded-xl shadow p-4 flex flex-col items-center">
+      <h2 class="font-semibold mb-2">Avg Appointment Duration</h2>
+      <div class="w-full flex flex-col items-center">
+        <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+          <div class="bg-blue-400 h-4 rounded-full" [style.width]="(avgDuration / maxAvgDuration * 100) + '%'" style="transition: width 0.5s;"></div>
+        </div>
+        <span class="text-lg font-bold text-blue-600">{{ avgDuration }} minutes</span>
+      </div>
+    </div>
+    <!-- Staff Workload Progress -->
+    <div class="flex-1 bg-white rounded-xl shadow p-4 flex flex-col items-center">
+      <h2 class="font-semibold mb-2">Staff Workload</h2>
+      <div class="w-full flex flex-col items-center">
+        <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+          <div class="bg-green-400 h-4 rounded-full" [style.width]="(staffStats?.workloadPercent || 0) + '%'" style="transition: width 0.5s;"></div>
+        </div>
+        <span class="text-lg font-bold text-green-600">{{ staffStats?.workloadPercent || 0 }}%</span>
+      </div>
+    </div>
+  </div>
+</div>
