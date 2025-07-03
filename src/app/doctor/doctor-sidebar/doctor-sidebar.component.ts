@@ -19,6 +19,8 @@ import { RouterModule } from '@angular/router';
          class="px-6 py-3 hover:bg-blue-50">Slot Assignment</a>
       <a routerLink="appointments" routerLinkActive="bg-blue-100 font-bold"
          class="px-6 py-3 hover:bg-blue-50">My Appointments</a>
+      <a routerLink="activity-logs" routerLinkActive="bg-blue-100 font-bold"
+         class="px-6 py-3 hover:bg-blue-50">Activity Logs</a>
     </nav>
   `,
   styleUrl: './doctor-sidebar.component.css'

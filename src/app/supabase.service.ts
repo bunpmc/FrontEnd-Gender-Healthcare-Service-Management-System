@@ -9,6 +9,13 @@ import { Category } from './models/category.interface';
 import { exitCode } from 'node:process';
 import { Appointment, Guest, GuestAppointment } from './models/appointment.interface';
 import { ɵMetadataOverrider } from '@angular/core/testing';
+import {
+  ActivityLog,
+  ActivityLogCreate,
+  ActivityLogUpdate,
+  ActivityLogFilters,
+  ActivityLogResponse
+} from './models/activity-log.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -591,6 +598,152 @@ export class SupabaseService {
     if (error) throw error;
     return data || [];
   }
+
+  //#region // ============= ACTIVITY LOGS FUNCTIONS ============= //
+
+  // Get activity logs for a doctor with pagination
+  async getDoctorActivityLogs(
+    doctorId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<ActivityLogResponse> {
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    const { data, error, count } = await supabase
+      .from('doctor_activity_logs')
+      .select('*', { count: 'exact' })
+      .eq('doctor_id', doctorId)
+      .order('created_at', { ascending: false })
+      .range(start, end);
+
+    if (error) {
+      console.error('Error fetching activity logs:', error);
+      throw error;
+    }
+
+    return {
+      data: data || [],
+      total: count || 0,
+      page,
+      limit
+    };
+  }
+
+  // Create a new activity log
+  async createActivityLog(activityLog: ActivityLogCreate): Promise<ActivityLog> {
+    const { data, error } = await supabase
+      .from('doctor_activity_logs')
+      .insert([{
+        doctor_id: activityLog.doctor_id,
+        activity_type: activityLog.activity_type,
+        title: activityLog.title,
+        description: activityLog.description,
+        patient_id: activityLog.patient_id,
+        appointment_id: activityLog.appointment_id,
+        metadata: activityLog.metadata,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating activity log:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  // Update an activity log
+  async updateActivityLog(logId: string, updateData: ActivityLogUpdate): Promise<void> {
+    const { error } = await supabase
+      .from('doctor_activity_logs')
+      .update({
+        activity_type: updateData.activity_type,
+        title: updateData.title,
+        description: updateData.description,
+        patient_id: updateData.patient_id,
+        appointment_id: updateData.appointment_id,
+        metadata: updateData.metadata,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', logId);
+
+    if (error) {
+      console.error('Error updating activity log:', error);
+      throw error;
+    }
+  }
+
+  // Delete an activity log
+  async deleteActivityLog(logId: string): Promise<void> {
+    const { error } = await supabase
+      .from('doctor_activity_logs')
+      .delete()
+      .eq('id', logId);
+
+    if (error) {
+      console.error('Error deleting activity log:', error);
+      throw error;
+    }
+  }
+
+  // Get activity logs with filters
+  async getFilteredActivityLogs(
+    doctorId: string,
+    filters: ActivityLogFilters,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<ActivityLogResponse> {
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    let query = supabase
+      .from('doctor_activity_logs')
+      .select('*', { count: 'exact' })
+      .eq('doctor_id', doctorId);
+
+    // Apply filters
+    if (filters.activity_type) {
+      query = query.eq('activity_type', filters.activity_type);
+    }
+
+    if (filters.date_from) {
+      query = query.gte('created_at', filters.date_from);
+    }
+
+    if (filters.date_to) {
+      query = query.lte('created_at', filters.date_to);
+    }
+
+    if (filters.patient_id) {
+      query = query.eq('patient_id', filters.patient_id);
+    }
+
+    if (filters.search_term) {
+      query = query.or(`title.ilike.%${filters.search_term}%,description.ilike.%${filters.search_term}%`);
+    }
+
+    const { data, error, count } = await query
+      .order('created_at', { ascending: false })
+      .range(start, end);
+
+    if (error) {
+      console.error('Error fetching filtered activity logs:', error);
+      throw error;
+    }
+
+    return {
+      data: data || [],
+      total: count || 0,
+      page,
+      limit
+    };
+  }
+
+  //#endregion
 
   // Get blog posts for a doctor
   async getDoctorBlogPosts(doctor_id: string) {

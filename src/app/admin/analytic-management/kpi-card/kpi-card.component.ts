@@ -1,13 +1,13 @@
 // kpi-card.component.ts
 import { Component, OnInit } from '@angular/core';
 import { SupabaseService } from '../../../supabase.service';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-kpi-card',
   standalone: true,
-  imports: [CommonModule, NgChartsModule],
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: './kpi-card.component.html',
   styleUrl: './kpi-card.component.css',
 })
