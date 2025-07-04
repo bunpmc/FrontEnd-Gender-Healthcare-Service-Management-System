@@ -151,14 +151,19 @@
     "LOAD_ERROR": "Unable to load latest blogs. Please try again."
   },
   "AI_CHAT": {
-    "TITLE": "AI Chat",
+    "TITLE": "AI Assistant",
+    "BRAND_NAME": "GenderCare",
     "BOT_NAME": "AI Assistant",
     "PLACEHOLDER": "Type your message...",
     "SEND": "Send",
     "CLEAR": "Clear chat",
+    "REFRESH": "Refresh",
     "CLOSE": "Close chat",
+    "MINIMIZE": "Minimize",
+    "ONLINE": "Online",
+    "OFFLINE": "Offline",
     "CONNECTION_LOST": "Connection lost. Trying to reconnect...",
-    "QUICK_REPLIES_TITLE": "Quick replies:",
+    "QUICK_REPLIES_TITLE": "Suggested questions",
     "QUICK_REPLIES": [
       "How can I help you?",
       "Find me a gynecologist",
@@ -167,8 +172,16 @@
       "I need technical support"
     ],
     "TYPING": "AI is thinking...",
-    "WELCOME": "Hello! 👋 I'm your healthcare assistant. I can help you find doctors, answer health questions, and provide support. How can I help you today?",
+    "WELCOME": "Hello! I'm your healthcare assistant. How can I help you today? 😊",
     "INPUT_HINT": "Press Enter to send • Shift + Enter for new line",
+    "ERROR": {
+      "CONNECTION_LOST": "Connection lost. Trying to reconnect... Please check if the server is running.",
+      "SERVER": "Server error. Please try again in a moment.",
+      "TOO_MANY": "Too many requests. Please wait a moment.",
+      "SERVICE_UNAVAILABLE": "Service temporarily unavailable. The system is still loading, please try again in a few moments.",
+      "NOT_FOUND": "Chat service not found. Please check if the server is running properly.",
+      "DEFAULT": "Something went wrong. Please try again."
+    },
     "ERROR_0": "Connection lost. Trying to reconnect... Please check if the server is running.",
     "ERROR_500": "Server error. Please try again in a moment.",
     "ERROR_429": "Too many requests. Please wait a moment.",

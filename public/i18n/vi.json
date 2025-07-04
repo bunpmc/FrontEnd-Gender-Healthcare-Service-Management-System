@@ -151,14 +151,19 @@
     "LOAD_ERROR": "Không tải được bài viết. Vui lòng thử lại."
   },
   "AI_CHAT": {
-    "TITLE": "Trò chuyện AI",
+    "TITLE": "Trợ lý AI",
+    "BRAND_NAME": "GenderCare",
     "BOT_NAME": "Trợ lý AI",
     "PLACEHOLDER": "Nhập tin nhắn của bạn...",
     "SEND": "Gửi",
     "CLEAR": "Xóa cuộc trò chuyện",
+    "REFRESH": "Làm mới",
     "CLOSE": "Đóng cửa sổ",
+    "MINIMIZE": "Thu nhỏ",
+    "ONLINE": "Trực tuyến",
+    "OFFLINE": "Ngoại tuyến",
     "CONNECTION_LOST": "Mất kết nối. Đang cố gắng kết nối lại...",
-    "QUICK_REPLIES_TITLE": "Gợi ý nhanh:",
+    "QUICK_REPLIES_TITLE": "Câu hỏi gợi ý",
     "QUICK_REPLIES": [
       "Tôi có thể giúp gì cho bạn?",
       "Tìm bác sĩ phụ khoa cho tôi",
@@ -167,8 +172,16 @@
       "Tôi cần hỗ trợ kỹ thuật"
     ],
     "TYPING": "AI đang suy nghĩ...",
-    "WELCOME": "Xin chào! 👋 Tôi là trợ lý sức khỏe của bạn. Tôi có thể giúp bạn tìm bác sĩ, trả lời các câu hỏi sức khỏe và hỗ trợ thêm. Bạn cần tôi giúp gì hôm nay?",
+    "WELCOME": "Xin chào! Tôi là trợ lý sức khỏe của bạn. Tôi có thể giúp gì cho bạn hôm nay? 😊",
     "INPUT_HINT": "Nhấn Enter để gửi • Shift + Enter để xuống dòng",
+    "ERROR": {
+      "CONNECTION_LOST": "Mất kết nối. Đang thử lại... Vui lòng kiểm tra server.",
+      "SERVER": "Lỗi server. Vui lòng thử lại sau.",
+      "TOO_MANY": "Quá nhiều yêu cầu. Vui lòng chờ một chút.",
+      "SERVICE_UNAVAILABLE": "Dịch vụ tạm thời không khả dụng. Hệ thống đang tải, vui lòng thử lại sau.",
+      "NOT_FOUND": "Không tìm thấy dịch vụ chat. Vui lòng kiểm tra lại server.",
+      "DEFAULT": "Có lỗi xảy ra. Vui lòng thử lại."
+    },
     "ERROR_0": "Mất kết nối. Đang thử lại... Vui lòng kiểm tra server.",
     "ERROR_500": "Lỗi server. Vui lòng thử lại sau.",
     "ERROR_429": "Quá nhiều yêu cầu. Vui lòng chờ một chút.",
