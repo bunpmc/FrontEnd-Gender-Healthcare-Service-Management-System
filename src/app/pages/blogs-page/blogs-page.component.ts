@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { UserService } from '../../Services/user.service';
@@ -14,6 +15,7 @@ import { BreadcrumbService } from '../../Services/Breadcrumb.service';
   imports: [
     CommonModule,
     RouterModule,
+    TranslateModule,
     HeaderComponent,
     FooterComponent,
     BreadcrumbsComponent,
@@ -23,6 +25,7 @@ import { BreadcrumbService } from '../../Services/Breadcrumb.service';
 })
 export class BlogsPageComponent implements OnInit {
   private userService = inject(UserService);
+  private translate = inject(TranslateService);
 
   skeletons = Array.from({ length: 6 });
   allBlogs: BlogDisplay[] = [];

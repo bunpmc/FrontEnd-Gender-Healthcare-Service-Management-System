@@ -7,6 +7,7 @@ import { MedicalService } from '../../models/service.model';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-service-page',
@@ -17,12 +18,14 @@ import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.c
     NgClass,
     RouterLink,
     BreadcrumbsComponent,
+    TranslateModule,
   ],
   templateUrl: './services-page.component.html',
   styleUrl: './services-page.component.css',
 })
 export class ServicePageComponent implements OnInit {
   private userService = inject(UserService);
+  private translate = inject(TranslateService);
 
   categories = signal<string[]>(['All']);
   services = signal<MedicalService[]>([]);
@@ -60,9 +63,10 @@ export class ServicePageComponent implements OnInit {
   }
 
   formatPrice(price: number): string {
+    const vndText = this.translate.instant('SERVICES.VND');
     return typeof price === 'number'
-      ? price.toLocaleString('en-US') + ' VND'
-      : price + ' VND';
+      ? price.toLocaleString('en-US') + ' ' + vndText
+      : price + ' ' + vndText;
   }
 
   get filteredServices(): MedicalService[] {

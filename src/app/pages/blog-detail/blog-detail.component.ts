@@ -7,6 +7,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { BlogDetail } from '../../models/blog.model';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '../../Services/Breadcrumb.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-blog-detail',
@@ -14,6 +15,7 @@ import { BreadcrumbService } from '../../Services/Breadcrumb.service';
   imports: [
     CommonModule,
     RouterModule,
+    TranslateModule,
     HeaderComponent,
     FooterComponent,
     BreadcrumbsComponent,
@@ -26,6 +28,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private router = inject(Router);
   private breadcrumbService = inject(BreadcrumbService);
+  private translate = inject(TranslateService);
 
   blog: BlogDetail | null = null;
   isLoading = true;

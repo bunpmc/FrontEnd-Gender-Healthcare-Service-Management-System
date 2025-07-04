@@ -7,19 +7,26 @@ import { UserService } from '../Services/user.service';
 import { BreadcrumbsComponent } from '../components/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '../Services/Breadcrumb.service';
 import { ServiceDetail } from '../models/service.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-service-detail',
   standalone: true,
   templateUrl: './service-detail.component.html',
   styleUrl: './service-detail.component.css',
-  imports: [FooterComponent, HeaderComponent, BreadcrumbsComponent],
+  imports: [
+    FooterComponent,
+    HeaderComponent,
+    BreadcrumbsComponent,
+    TranslateModule,
+  ],
 })
 export class ServiceDetailComponent implements OnInit {
   private userService = inject(UserService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private breadcrumbService = inject(BreadcrumbService);
+  private translate = inject(TranslateService);
 
   // Signals for state
   service = signal<ServiceDetail | null>(null);

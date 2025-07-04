@@ -125,11 +125,11 @@
               <span
                 class="px-3 py-1 rounded-full font-medium text-white capitalize tracking-wide"
                 [ngClass]="{
-                  'bg-blue-500': doc.staff_members.gender === 'Male',
-                  'bg-pink-500': doc.staff_members.gender === 'Female',
+                  'bg-blue-600': doc.staff_members.gender === 'MALE',
+                  'bg-pink-600': doc.staff_members.gender === 'FEMALE',
                   'bg-gray-600':
-                    doc.staff_members.gender !== 'Male' &&
-                    doc.staff_members.gender !== 'Female'
+                    doc.staff_members.gender !== 'MALE' &&
+                    doc.staff_members.gender !== 'FEMALE'
                 }"
               >
                 {{ "DOCTOR.GENDER." + doc.staff_members.gender | translate }}

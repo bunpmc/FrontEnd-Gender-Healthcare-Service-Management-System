@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '../../Services/Breadcrumb.service';
 import { Subscription } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-doctor-detail',
@@ -37,6 +37,7 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private userService = inject(UserService);
   private breadcrumbService = inject(BreadcrumbService);
+  private translate = inject(TranslateService);
 
   private doctorId: string | null = null;
   private breadcrumbSub?: Subscription;

@@ -193,5 +193,105 @@
     "COPY_FAIL": "Sao chép thông tin thất bại",
     "DOCTOR_LIST_TITLE": "Danh sách bác sĩ gợi ý",
     "MESSAGE_TIME_FORMAT": "HH:mm"
+  },
+  "APPOINTMENT": {
+    "TITLE": "Đặt lịch hẹn",
+    "BOOKING_TYPE": {
+      "TITLE": "Bạn muốn đặt lịch hẹn như thế nào?",
+      "SERVICE_FIRST": {
+        "TITLE": "Đặt theo dịch vụ",
+        "DESCRIPTION": "Chọn loại chăm sóc bạn cần — chúng tôi sẽ kết nối bạn với nhà cung cấp phù hợp."
+      },
+      "DOCTOR_FIRST": {
+        "TITLE": "Đặt theo bác sĩ",
+        "DESCRIPTION": "Chọn bác sĩ ưa thích của bạn và xem thời gian có sẵn để khám."
+      }
+    },
+    "PATIENT_INFO": {
+      "TITLE": "Thông tin bệnh nhân",
+      "FULL_NAME": "Họ và tên",
+      "EMAIL": "Email",
+      "EMAIL_OPTIONAL": "(Tùy chọn)",
+      "PHONE": "Số điện thoại",
+      "GENDER": "Giới tính",
+      "REASON": "Lý do khám",
+      "PLACEHOLDERS": {
+        "FULL_NAME": "vd. Nguyễn Văn A",
+        "EMAIL": "vd. johndoe@email.com",
+        "REASON": "Mô tả lý do chính để khám (vd. đau đầu, kiểm tra sức khỏe, ...)"
+      },
+      "GENDER_OPTIONS": {
+        "SELECT": "--- Chọn giới tính ---",
+        "MALE": "Nam",
+        "FEMALE": "Nữ",
+        "OTHER": "Khác / Không muốn nói"
+      }
+    },
+    "ERRORS": {
+      "FULL_NAME_REQUIRED": "Vui lòng nhập họ và tên.",
+      "EMAIL_INVALID": "Vui lòng nhập địa chỉ email hợp lệ.",
+      "PHONE_INVALID": "Vui lòng nhập số điện thoại hợp lệ.",
+      "REASON_REQUIRED": "Vui lòng cung cấp lý do khám.",
+      "SERVICE_REQUIRED": "Vui lòng chọn một dịch vụ để tiếp tục.",
+      "DOCTOR_REQUIRED": "Vui lòng chọn một bác sĩ để tiếp tục.",
+      "SLOT_REQUIRED": "Vui lòng chọn một khung giờ để tiếp tục."
+    },
+    "BUTTONS": {
+      "CONTINUE": "TIẾP TỤC",
+      "BACK": "Quay lại"
+    },
+    "STEPS": {
+      "SELECT_SERVICE": "Chọn dịch vụ",
+      "SELECT_DOCTOR": "Chọn bác sĩ",
+      "SELECT_TIME": "Chọn thời gian hẹn",
+      "SELECT_SERVICE_FOR": "Chọn dịch vụ cho",
+      "SELECT_DOCTOR_FOR": "Chọn bác sĩ cho dịch vụ"
+    },
+    "SEARCH": {
+      "SERVICE": "Tìm kiếm dịch vụ theo tên hoặc mô tả...",
+      "DOCTOR": "Tìm kiếm bác sĩ theo tên hoặc chuyên khoa..."
+    },
+    "FILTERS": {
+      "SORT_BY": "Sắp xếp theo:",
+      "GENDER": "Giới tính:",
+      "ALL": "Tất cả",
+      "MALE": "Nam",
+      "FEMALE": "Nữ",
+      "NAME_AZ": "Tên (A-Z)",
+      "DESCRIPTION": "Mô tả",
+      "SPECIALIZATION": "Chuyên khoa"
+    },
+    "NO_RESULTS": {
+      "SERVICE": "Không tìm thấy dịch vụ.",
+      "DOCTOR": "Không tìm thấy bác sĩ."
+    },
+    "TIME_SLOT": {
+      "TITLE": "Chọn thời gian hẹn",
+      "DATE": "Ngày",
+      "AVAILABLE_SLOTS": "Khung giờ có sẵn",
+      "FULL": "(Đầy)"
+    }
+  },
+  "SERVICES": {
+    "TITLE": "Chúng tôi có thể giúp gì cho bạn?",
+    "SEARCH_PLACEHOLDER": "Tìm kiếm dịch vụ...",
+    "ALL_CATEGORIES": "Tất cả",
+    "LOADING": "Đang tải dịch vụ...",
+    "NO_SERVICES": "Không tìm thấy dịch vụ nào.",
+    "BOOK_NOW": "Đặt lịch ngay",
+    "PRICE": "Giá",
+    "VND": "VNĐ",
+    "PAGINATION": {
+      "PREV": "Trước",
+      "NEXT": "Tiếp"
+    }
+  },
+  "CONTACT_SUPPORT": {
+    "PHONE_TITLE": "Gọi điện thoại",
+    "ZALO_TITLE": "Chat Zalo",
+    "ZALO_CHAT": "Nhắn tin Zalo"
+  },
+  "BACK_TO_TOP": {
+    "TITLE": "Lên đầu trang"
   }
 }

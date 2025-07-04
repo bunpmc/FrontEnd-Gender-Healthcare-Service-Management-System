@@ -8,14 +8,14 @@
     class="max-w-7xl mx-auto py-10 px-6 text-black bg-[#f8f8f8] min-h-screen"
   >
     <h2 class="text-2xl font-bold text-center mb-6 text-[#222e5c]">
-      How can we help you?
+      {{ "SERVICES.TITLE" | translate }}
     </h2>
 
     <!-- Search -->
     <div class="flex justify-center mb-6">
       <input
         type="text"
-        placeholder="Search services..."
+        [placeholder]="'SERVICES.SEARCH_PLACEHOLDER' | translate"
         class="w-2/3 px-4 py-2 rounded-full border border-gray-300 shadow"
         (input)="onSearch($event)"
         [value]="searchValue()"
@@ -34,7 +34,7 @@
             : 'bg-white border-gray-300 text-gray-600 hover:bg-blue-50'
         "
       >
-        {{ cat }}
+        {{ cat === "All" ? ("SERVICES.ALL_CATEGORIES" | translate) : cat }}
       </button>
       }
     </div>
@@ -101,13 +101,13 @@
             routerLink="/appointment"
             (click)="bookService(sv, $event)"
           >
-            Book now
+            {{ "SERVICES.BOOK_NOW" | translate }}
           </button>
         </div>
       </div>
       } @if (paginatedServices.length === 0) {
       <div class="col-span-full text-center text-gray-400 text-xl py-12">
-        No service found.
+        {{ "SERVICES.NO_SERVICES" | translate }}
       </div>
       }
     </div>
@@ -120,10 +120,12 @@
         (click)="goToPage(page() - 1)"
         class="px-3 py-1 rounded border bg-white hover:bg-blue-50 transition"
       >
-        Prev
+        {{ "SERVICES.PAGINATION.PREV" | translate }}
       </button>
       } @else {
-      <button class="px-3 py-1 rounded border bg-white invisible">Prev</button>
+      <button class="px-3 py-1 rounded border bg-white invisible">
+        {{ "SERVICES.PAGINATION.PREV" | translate }}
+      </button>
       } @for (p of pageArray; track p) {
       <button
         (click)="goToPage(p)"
@@ -139,10 +141,12 @@
         (click)="goToPage(page() + 1)"
         class="px-3 py-1 rounded border bg-white hover:bg-blue-50 transition"
       >
-        Next
+        {{ "SERVICES.PAGINATION.NEXT" | translate }}
       </button>
       } @else {
-      <button class="px-3 py-1 rounded border bg-white invisible">Next</button>
+      <button class="px-3 py-1 rounded border bg-white invisible">
+        {{ "SERVICES.PAGINATION.NEXT" | translate }}
+      </button>
       }
     </div>
   </div>

@@ -14,12 +14,13 @@ import { debounceTime } from 'rxjs';
 import { UserService } from '../../Services/user.service';
 import { TokenService } from '../../Services/token.service';
 import { type UserLogin } from '../../models/user.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // ==================== COMPONENT DECORATOR ====================
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, GoogleComponent],
+  imports: [FormsModule, GoogleComponent, TranslateModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -39,6 +40,7 @@ export class LoginComponent {
   private userService = inject(UserService);
   private tokenService = inject(TokenService);
   public router = inject(Router);
+  private translate = inject(TranslateService);
 
   // ==================== CONSTRUCTOR ====================
   constructor() {

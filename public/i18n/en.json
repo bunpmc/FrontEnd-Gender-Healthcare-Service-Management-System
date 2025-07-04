@@ -193,5 +193,105 @@
     "COPY_FAIL": "Failed to copy contact info",
     "DOCTOR_LIST_TITLE": "Doctor Recommendations",
     "MESSAGE_TIME_FORMAT": "HH:mm"
+  },
+  "APPOINTMENT": {
+    "TITLE": "Book Appointment",
+    "BOOKING_TYPE": {
+      "TITLE": "How would you like to book your appointment?",
+      "SERVICE_FIRST": {
+        "TITLE": "Book by Service",
+        "DESCRIPTION": "Select the type of care you need — we'll match you with the right provider."
+      },
+      "DOCTOR_FIRST": {
+        "TITLE": "Book by Doctor",
+        "DESCRIPTION": "Pick your preferred doctor and see available times for a visit."
+      }
+    },
+    "PATIENT_INFO": {
+      "TITLE": "Patient Information",
+      "FULL_NAME": "Full Name",
+      "EMAIL": "Email",
+      "EMAIL_OPTIONAL": "(Optional)",
+      "PHONE": "Phone Number",
+      "GENDER": "Gender",
+      "REASON": "Reason for Visit",
+      "PLACEHOLDERS": {
+        "FULL_NAME": "e.g. John Doe",
+        "EMAIL": "e.g. johndoe@email.com",
+        "REASON": "Describe the main reason for your visit (e.g. headache, checkup, ...)"
+      },
+      "GENDER_OPTIONS": {
+        "SELECT": "--- Select gender ---",
+        "MALE": "Male",
+        "FEMALE": "Female",
+        "OTHER": "Other / Prefer not to say"
+      }
+    },
+    "ERRORS": {
+      "FULL_NAME_REQUIRED": "Please enter your full name.",
+      "EMAIL_INVALID": "Please enter a valid email address.",
+      "PHONE_INVALID": "Please enter a valid phone number.",
+      "REASON_REQUIRED": "Please provide a reason for your visit.",
+      "SERVICE_REQUIRED": "Please select a service to continue.",
+      "DOCTOR_REQUIRED": "Please select a doctor to continue.",
+      "SLOT_REQUIRED": "Please select a time slot to continue."
+    },
+    "BUTTONS": {
+      "CONTINUE": "CONTINUE",
+      "BACK": "Back"
+    },
+    "STEPS": {
+      "SELECT_SERVICE": "Select Service",
+      "SELECT_DOCTOR": "Select Doctor",
+      "SELECT_TIME": "Select an appointment time",
+      "SELECT_SERVICE_FOR": "Select service for",
+      "SELECT_DOCTOR_FOR": "Select doctor for service"
+    },
+    "SEARCH": {
+      "SERVICE": "Search service by name or description...",
+      "DOCTOR": "Search doctor by name or specialization..."
+    },
+    "FILTERS": {
+      "SORT_BY": "Sort by:",
+      "GENDER": "Gender:",
+      "ALL": "All",
+      "MALE": "Male",
+      "FEMALE": "Female",
+      "NAME_AZ": "Name (A-Z)",
+      "DESCRIPTION": "Description",
+      "SPECIALIZATION": "Specialization"
+    },
+    "NO_RESULTS": {
+      "SERVICE": "No service found.",
+      "DOCTOR": "No doctor found."
+    },
+    "TIME_SLOT": {
+      "TITLE": "Select an appointment time",
+      "DATE": "Date",
+      "AVAILABLE_SLOTS": "Available time slots",
+      "FULL": "(Full)"
+    }
+  },
+  "SERVICES": {
+    "TITLE": "How can we help you?",
+    "SEARCH_PLACEHOLDER": "Search services...",
+    "ALL_CATEGORIES": "All",
+    "LOADING": "Loading services...",
+    "NO_SERVICES": "No services found.",
+    "BOOK_NOW": "Book Now",
+    "PRICE": "Price",
+    "VND": "VND",
+    "PAGINATION": {
+      "PREV": "Previous",
+      "NEXT": "Next"
+    }
+  },
+  "CONTACT_SUPPORT": {
+    "PHONE_TITLE": "Call Phone",
+    "ZALO_TITLE": "Chat Zalo",
+    "ZALO_CHAT": "Message on Zalo"
+  },
+  "BACK_TO_TOP": {
+    "TITLE": "Back to Top"
   }
 }

@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import {
   BookingState,
@@ -21,13 +22,14 @@ import {
 @Component({
   selector: 'app-appointmentPage',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './appointment-page.component.html',
   styleUrls: ['./appointment-page.component.css'],
 })
 export class AppointmentPageComponent implements OnInit {
   // ========== CORE STATE ==========
   private router = inject(Router);
+  private translate = inject(TranslateService);
   currentStep: number = 0;
   bookingType: 'docfirst' | 'serfirst' | null = null;
   selectedType: 'serfirst' | 'docfirst' | null = null;
