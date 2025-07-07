@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DoctorDetail } from '../../models/doctor.model';
-import { UserService } from '../../Services/user.service';
+import { DoctorService } from '../../Services/doctor.service';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
@@ -35,7 +35,7 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private userService = inject(UserService);
+  private doctorService = inject(DoctorService);
   private breadcrumbService = inject(BreadcrumbService);
   private translate = inject(TranslateService);
 
@@ -58,8 +58,8 @@ export class DoctorDetailComponent implements OnInit, OnDestroy {
   fetchDoctor(doctor_id: string): void {
     this.loading.set(true);
     this.errorMsg.set('');
-    this.userService.getDoctorById(doctor_id).subscribe({
-      next: (doctor) => {
+    this.doctorService.getDoctorById(doctor_id).subscribe({
+      next: (doctor: any) => {
         this.doctor.set(doctor);
         this.loading.set(false);
         const breadcrumbPath = `/doctor/${doctor_id}`;

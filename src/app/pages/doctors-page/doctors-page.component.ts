@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Doctor } from '../../models/doctor.model';
-import { UserService } from '../../Services/user.service';
+import { DoctorService } from '../../Services/doctor.service';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
@@ -32,10 +32,10 @@ export class DoctorsPageComponent implements OnInit {
 
   // Filter state
   searchValue: string = '';
-  selectedSpecialty: string = 'All';
-  selectedGender: string = 'All';
-  specialties: string[] = ['All'];
-  genders: string[] = ['All', 'MALE', 'FEMALE', 'OTHER'];
+  selectedSpecialty: string = '';
+  selectedGender: string = '';
+  specialties: string[] = [];
+  genders: string[] = [];
 
   // Pagination state
   page = 1;
@@ -47,17 +47,29 @@ export class DoctorsPageComponent implements OnInit {
 
   fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
 
-  private userService = inject(UserService);
+  private doctorService = inject(DoctorService);
   private translate = inject(TranslateService);
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Initialize translated filter options
+    const allText = this.translate.instant('COMMON.ALL');
+    this.selectedSpecialty = allText;
+    this.selectedGender = allText;
+    this.genders = [
+      allText,
+      this.translate.instant('COMMON.MALE'),
+      this.translate.instant('COMMON.FEMALE'),
+      this.translate.instant('COMMON.OTHER'),
+    ];
+
     this.fetchDoctors();
   }
 
   fetchDoctors(): void {
     this.loading = true;
-    this.userService.getDoctors('', '', '').subscribe({
+    this.doctorService.getDoctors('', '', '').subscribe({
       next: (data) => {
         // Chuẩn hóa lại gender cho từng staff_members
         data.forEach((doc: any) => {
@@ -74,7 +86,8 @@ export class DoctorsPageComponent implements OnInit {
         const uniqueSpecialties = Array.from(
           new Set(data.map((doc) => doc.speciality).filter(Boolean))
         );
-        this.specialties = ['All', ...uniqueSpecialties];
+        const allText = this.translate.instant('COMMON.ALL');
+        this.specialties = [allText, ...uniqueSpecialties];
         this.page = 1;
         this.updatePagination();
         this.loading = false;
@@ -125,13 +138,14 @@ export class DoctorsPageComponent implements OnInit {
     let filtered = this.allDoctors;
 
     // Filter by specialty
-    if (this.selectedSpecialty !== 'All')
+    const allText = this.translate.instant('COMMON.ALL');
+    if (this.selectedSpecialty !== allText)
       filtered = filtered.filter(
         (doc) => doc.speciality === this.selectedSpecialty
       );
 
     // Filter by gender
-    if (this.selectedGender !== 'All')
+    if (this.selectedGender !== allText)
       filtered = filtered.filter(
         (doc) => doc.staff_members?.gender === this.selectedGender
       );

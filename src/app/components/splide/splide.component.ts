@@ -1,29 +1,37 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  inject,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 import Splide from '@splidejs/splide';
 import { Doctor } from '../../models/doctor.model';
-import { UserService } from '../../Services/user.service';
+import { DoctorService } from '../../Services/doctor.service';
 
 @Component({
   selector: 'app-splide',
   standalone: true,
   imports: [RouterLink, NgClass],
   templateUrl: './splide.component.html',
-  styleUrls: ['./splide.component.css']
+  styleUrls: ['./splide.component.css'],
 })
 export class SplideComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('splideRef') splideRef!: ElementRef;
-  
+
   // State
   doctors: Doctor[] = [];
   loading = false;
   splide: any;
-  
+
   // Fallback image
   fallbackImage = 'https://via.placeholder.com/300x400?text=No+Image';
-  
-  private userService = inject(UserService);
+
+  private doctorService = inject(DoctorService);
 
   ngOnInit(): void {
     this.fetchDoctors();
@@ -47,13 +55,13 @@ export class SplideComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   fetchDoctors(): void {
     this.loading = true;
-    
+
     // Fetch featured doctors (you can modify the parameters as needed)
-    this.userService.getDoctors('', '', '').subscribe({
-      next: (data) => {
+    this.doctorService.getDoctors('', '', '').subscribe({
+      next: (data: any) => {
         // Limit to first 8 doctors for homepage display
         this.doctors = data.slice(0, 8);
-        
+
         // Initialize splide after data is loaded
         setTimeout(() => {
           if (this.splideRef && this.doctors.length > 0) {
@@ -66,7 +74,7 @@ export class SplideComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       complete: () => {
         this.loading = false;
-      }
+      },
     });
   }
 

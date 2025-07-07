@@ -7,7 +7,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { SplideComponent } from '../../components/splide/splide.component';
 import { SupportChatComponent } from '../../components/support-chat/support-chat.component';
-import { UserService } from '../../Services/user.service';
+import { BlogService } from '../../Services/blog.service';
 import { Blog, BlogDisplay } from '../../models/blog.model';
 
 @Component({
@@ -26,7 +26,7 @@ import { Blog, BlogDisplay } from '../../models/blog.model';
   styleUrl: './home-page.component.css',
 })
 export class HomePageComponent implements OnInit {
-  private userService = inject(UserService);
+  private blogService = inject(BlogService);
 
   latestBlogs: BlogDisplay[] = [];
   isLoadingBlogs = false;
@@ -41,7 +41,7 @@ export class HomePageComponent implements OnInit {
     this.isLoadingBlogs = true;
     this.blogError = null;
 
-    this.userService.getBlogs().subscribe({
+    this.blogService.getBlogs().subscribe({
       next: (blogs: Blog[]) => {
         this.latestBlogs = blogs
           .map((blog) => this.mapBlogToDisplay(blog))

@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { UserService } from '../../Services/user.service';
+import { BlogService } from '../../Services/blog.service';
 import { Blog, BlogDisplay } from '../../models/blog.model';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '../../Services/Breadcrumb.service';
@@ -24,7 +24,7 @@ import { BreadcrumbService } from '../../Services/Breadcrumb.service';
   styleUrl: './blogs-page.component.css',
 })
 export class BlogsPageComponent implements OnInit {
-  private userService = inject(UserService);
+  private blogService = inject(BlogService);
   private translate = inject(TranslateService);
 
   skeletons = Array.from({ length: 6 });
@@ -35,15 +35,8 @@ export class BlogsPageComponent implements OnInit {
   // Đây là mảng gom tất cả tag không trùng (tag cloud, filter...)
   allTags: string[] = [];
 
-  categories: string[] = [
-    'All',
-    'Community',
-    'Mental Health',
-    'Gender Stories',
-    'Legal',
-    'Education',
-  ];
-  selectedCategory: string = 'All';
+  categories: string[] = [];
+  selectedCategory: string = '';
   searchValue: string = '';
 
   // Pagination
@@ -57,6 +50,18 @@ export class BlogsPageComponent implements OnInit {
   selectedTag: string | null = null;
 
   ngOnInit() {
+    // Initialize translated categories
+    const allText = this.translate.instant('COMMON.ALL');
+    this.categories = [
+      allText,
+      this.translate.instant('BLOG.CATEGORIES.COMMUNITY'),
+      this.translate.instant('BLOG.CATEGORIES.MENTAL_HEALTH'),
+      this.translate.instant('BLOG.CATEGORIES.GENDER_STORIES'),
+      this.translate.instant('BLOG.CATEGORIES.LEGAL'),
+      this.translate.instant('BLOG.CATEGORIES.EDUCATION'),
+    ];
+    this.selectedCategory = allText;
+
     this.loadBlogs();
   }
 
@@ -64,7 +69,7 @@ export class BlogsPageComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    this.userService.getBlogs().subscribe({
+    this.blogService.getBlogs().subscribe({
       next: (blogs: Blog[]) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -77,7 +82,7 @@ export class BlogsPageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading blogs:', error);
-        this.error = 'Không thể tải danh sách blog. Vui lòng thử lại sau.';
+        this.error = this.translate.instant('BLOG.ERRORS.LOAD_FAILED');
         this.isLoading = false;
       },
     });
@@ -146,14 +151,15 @@ export class BlogsPageComponent implements OnInit {
 
   filterByTag(tag: string) {
     this.selectedTag = tag;
-    this.selectedCategory = 'All';
+    this.selectedCategory = this.translate.instant('COMMON.ALL');
     this.page = 1;
   }
 
   get filteredBlogs(): BlogDisplay[] {
     let result = this.allBlogs;
 
-    if (this.selectedCategory !== 'All') {
+    const allText = this.translate.instant('COMMON.ALL');
+    if (this.selectedCategory !== allText) {
       result = result.filter((b) => b.category === this.selectedCategory);
     }
     if (this.selectedTag) {

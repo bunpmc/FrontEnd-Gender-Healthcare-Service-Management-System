@@ -11,7 +11,7 @@ import {
 import { FormsModule, NgForm } from '@angular/forms';
 import { GoogleComponent } from '../../components/google/google.component';
 import { debounceTime } from 'rxjs';
-import { UserService } from '../../Services/user.service';
+import { AuthService } from '../../Services/auth.service';
 import { TokenService } from '../../Services/token.service';
 import { type UserLogin } from '../../models/user.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -37,7 +37,7 @@ export class LoginComponent {
   // ==================== VIEWCHILD & DEPENDENCY INJECTION ====================
   private form = viewChild.required<NgForm>('form');
   private destroyRef = inject(DestroyRef);
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
   private tokenService = inject(TokenService);
   public router = inject(Router);
   private translate = inject(TranslateService);
@@ -115,7 +115,7 @@ export class LoginComponent {
       const rememberMe = formData.form.value.rememberMe;
 
       // --- Gọi API login ---
-      const subscription = this.userService
+      const subscription = this.authService
         .loginWithPhone(phone, password)
         .subscribe({
           next: (res: any) => {
@@ -151,14 +151,20 @@ export class LoginComponent {
           error: (err: any) => {
             // --- Xử lý lỗi ---
             if (err.status === 401) {
-              this.errorMsg = 'Sai số điện thoại hoặc mật khẩu!';
+              this.errorMsg = this.translate.instant(
+                'LOGIN.ERRORS.INVALID_CREDENTIALS'
+              );
               this.isWrong = true;
               alert(this.errorMsg);
             } else if (err.status === 500) {
-              this.errorMsg = 'Lỗi server, vui lòng thử lại!';
+              this.errorMsg = this.translate.instant(
+                'LOGIN.ERRORS.SERVER_ERROR'
+              );
               alert(this.errorMsg);
             } else {
-              this.errorMsg = 'Đăng nhập thất bại!';
+              this.errorMsg = this.translate.instant(
+                'LOGIN.ERRORS.LOGIN_FAILED'
+              );
               alert(this.errorMsg);
             }
             this.isSubmitting = false;

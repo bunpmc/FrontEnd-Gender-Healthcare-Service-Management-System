@@ -9,15 +9,16 @@ import {
 import { FormsModule, NgForm } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { GoogleComponent } from '../../components/google/google.component';
-import { UserService } from '../../Services/user.service';
+import { AuthService } from '../../Services/auth.service';
 import { TokenService } from '../../Services/token.service';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // ==================== COMPONENT DECORATOR ====================
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule, GoogleComponent],
+  imports: [FormsModule, GoogleComponent, TranslateModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })
@@ -33,9 +34,10 @@ export class RegisterComponent {
   // ==================== VIEWCHILD & DEPENDENCY INJECTION ====================
   private form = viewChild.required<NgForm>('form');
   private destroyRef = inject(DestroyRef);
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
   private tokenService = inject(TokenService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   // ==================== CONSTRUCTOR ====================
   constructor() {
@@ -48,7 +50,6 @@ export class RegisterComponent {
           if (this.form().controls['phone'] && loadedFormData.phone) {
             this.form().controls['phone'].setValue(loadedFormData.phone);
           }
-
         });
       }
       // --- Lưu form mỗi khi thay đổi, debounce tránh spam ---
@@ -87,7 +88,7 @@ export class RegisterComponent {
     this.formSubmitted = true;
     this.errorMsg = '';
     if (formData.valid) {
-      const subscription = this.userService
+      const subscription = this.authService
         .registerUser(formData.form.value)
         .subscribe({
           next: (res: any) => {
@@ -108,14 +109,20 @@ export class RegisterComponent {
           },
           error: (err) => {
             if (err.status === 401) {
-              this.errorMsg = 'Số điện thoại này đã được đăng ký!';
+              this.errorMsg = this.translate.instant(
+                'REGISTER.ERRORS.PHONE_ALREADY_USED'
+              );
               alert(this.errorMsg);
               this.isUsed = true;
             } else if (err.status === 500) {
-              this.errorMsg = 'Lỗi server, vui lòng thử lại sau!';
+              this.errorMsg = this.translate.instant(
+                'REGISTER.ERRORS.SERVER_ERROR'
+              );
               alert(this.errorMsg);
             } else {
-              this.errorMsg = 'Đăng ký thất bại, kiểm tra lại thông tin!';
+              this.errorMsg = this.translate.instant(
+                'REGISTER.ERRORS.REGISTRATION_FAILED'
+              );
               alert(this.errorMsg);
             }
             this.isSubmitting = false;

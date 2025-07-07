@@ -564,22 +564,30 @@
             alt="{{ doctor.full_name }}"
             class="w-12 h-12 object-cover rounded-full border"
           />
-          <div>
-            <div class="text-base font-semibold text-[#4e6688]">
+          <div class="flex-1">
+            <div class="text-base font-semibold text-[#4e6688] mb-1">
               {{ doctor.full_name }}
             </div>
-            <div class="text-xs text-gray-500">{{ doctor.specialization }}</div>
-            <div class="text-xs capitalize">
+            <div class="text-xs text-gray-500 mb-1">
+              {{ doctor.specialization }}
+            </div>
+            <div class="flex items-center">
               <span
-                class="px-2 py-1 rounded-full font-medium text-white text-xs"
+                class="text-xs font-medium"
                 [ngClass]="{
-                  'bg-blue-600': doctor.gender === 'male',
-                  'bg-pink-600': doctor.gender === 'female',
-                  'bg-gray-600':
+                  'text-blue-600': doctor.gender === 'male',
+                  'text-pink-600': doctor.gender === 'female',
+                  'text-gray-600':
                     doctor.gender !== 'male' && doctor.gender !== 'female'
                 }"
               >
-                {{ doctor.gender }}
+                {{
+                  doctor.gender === "male"
+                    ? "Nam"
+                    : doctor.gender === "female"
+                    ? "Nữ"
+                    : doctor.gender
+                }}
               </span>
             </div>
           </div>
@@ -793,22 +801,30 @@
             alt="{{ doctor.full_name }}"
             class="w-12 h-12 object-cover rounded-full border"
           />
-          <div>
-            <div class="text-base font-semibold text-[#4e6688]">
+          <div class="flex-1">
+            <div class="text-base font-semibold text-[#4e6688] mb-1">
               {{ doctor.full_name }}
             </div>
-            <div class="text-xs text-gray-500">{{ doctor.specialization }}</div>
-            <div class="text-xs capitalize">
+            <div class="text-xs text-gray-500 mb-1">
+              {{ doctor.specialization }}
+            </div>
+            <div class="flex items-center">
               <span
-                class="px-2 py-1 rounded-full font-medium text-white text-xs"
+                class="text-xs font-medium"
                 [ngClass]="{
-                  'bg-blue-600': doctor.gender === 'male',
-                  'bg-pink-600': doctor.gender === 'female',
-                  'bg-gray-600':
+                  'text-blue-600': doctor.gender === 'male',
+                  'text-pink-600': doctor.gender === 'female',
+                  'text-gray-600':
                     doctor.gender !== 'male' && doctor.gender !== 'female'
                 }"
               >
-                {{ doctor.gender }}
+                {{
+                  doctor.gender === "male"
+                    ? "Nam"
+                    : doctor.gender === "female"
+                    ? "Nữ"
+                    : doctor.gender
+                }}
               </span>
             </div>
           </div>

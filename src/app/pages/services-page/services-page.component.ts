@@ -2,7 +2,7 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { UserService } from '../../Services/user.service';
+import { MedicalService as MedicalServiceAPI } from '../../Services/medical.service';
 import { MedicalService } from '../../models/service.model';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -24,13 +24,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   styleUrl: './services-page.component.css',
 })
 export class ServicePageComponent implements OnInit {
-  private userService = inject(UserService);
+  private medicalService = inject(MedicalServiceAPI);
   private translate = inject(TranslateService);
 
-  categories = signal<string[]>(['All']);
+  categories = signal<string[]>([]);
   services = signal<MedicalService[]>([]);
   searchValue = signal('');
-  selectedCategory = signal('All');
+  selectedCategory = signal('');
   page = signal(1);
   pageSize = 6;
   loading = signal(true);
@@ -38,17 +38,19 @@ export class ServicePageComponent implements OnInit {
 
   ngOnInit() {
     this.loading.set(true);
-    this.userService.getServices().subscribe({
-      next: (data) => {
+
+    // Initialize with translated "All" category
+    const allText = this.translate.instant('SERVICES.ALL_CATEGORIES');
+    this.selectedCategory.set(allText);
+
+    this.medicalService.getServices().subscribe({
+      next: (data: MedicalService[]) => {
         this.services.set(data || []);
-        const uniqueCats = Array.from(
-          new Set(
-            (data || [])
-              .map((s) => s.service_categories?.category_name)
-              .filter(Boolean)
-          )
-        );
-        this.categories.set(['All', ...uniqueCats]);
+        const categoryNames = (data || [])
+          .map((s: MedicalService) => s.service_categories?.category_name)
+          .filter((name): name is string => Boolean(name));
+        const uniqueCats = Array.from(new Set(categoryNames));
+        this.categories.set([allText, ...uniqueCats]);
         this.loading.set(false);
       },
       error: () => {
@@ -71,7 +73,8 @@ export class ServicePageComponent implements OnInit {
 
   get filteredServices(): MedicalService[] {
     let filtered = this.services();
-    if (this.selectedCategory() !== 'All') {
+    const allText = this.translate.instant('SERVICES.ALL_CATEGORIES');
+    if (this.selectedCategory() !== allText) {
       filtered = filtered.filter(
         (s) => s.service_categories?.category_name === this.selectedCategory()
       );
@@ -124,7 +127,8 @@ export class ServicePageComponent implements OnInit {
 
   bookService(service: MedicalService, event: Event) {
     event.preventDefault();
-    const message = `I want to ask about ${service.name}`;
+    const messageTemplate = this.translate.instant('SERVICES.INQUIRY_MESSAGE');
+    const message = `${messageTemplate} ${service.name}`;
     localStorage.setItem('Remember-contact-form', JSON.stringify({ message }));
   }
 }

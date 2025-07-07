@@ -1,7 +1,7 @@
 import { NgClass } from '@angular/common';
 import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../../Services/user.service';
+import { AuthService } from '../../Services/auth.service';
 import { TranslateService, TranslateModule } from '@ngx-translate/core'; // THÊM
 import { TokenService } from '../../Services/token.service';
 
@@ -21,7 +21,7 @@ export class HeaderComponent implements OnInit {
   user: any = null;
   currentLang = 'vi'; // Ngôn ngữ hiện tại
 
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private translate = inject(TranslateService); // THÊM
 
@@ -45,11 +45,11 @@ export class HeaderComponent implements OnInit {
   }
 
   getUserInfo() {
-    this.userService.getUserProfile().subscribe({
-      next: (data) => {
+    this.authService.getUserProfile().subscribe({
+      next: (data: any) => {
         this.user = data;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.user = null;
       },
     });

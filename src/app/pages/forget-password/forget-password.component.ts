@@ -1,11 +1,12 @@
 import { Component, inject, signal, Output, EventEmitter } from '@angular/core';
-import { UserService } from '../../Services/user.service';
+import { AuthService } from '../../Services/auth.service';
 import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslateModule],
   templateUrl: './forget-password.component.html',
   styleUrl: './forget-password.component.css',
 })
@@ -21,7 +22,8 @@ export class ForgotPasswordComponent {
   errorMsg = signal('');
   successMsg = signal('');
 
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
+  private translate = inject(TranslateService);
 
   // Gửi OTP
   onSubmitPhone(form: NgForm) {
@@ -30,13 +32,18 @@ export class ForgotPasswordComponent {
     this.successMsg.set('');
     if (!form.valid) return;
     this.isLoading.set(true);
-    this.userService.forgotPassword(this.phone()).subscribe({
+    this.authService.forgotPassword(this.phone()).subscribe({
       next: () => {
-        this.successMsg.set('OTP đã được gửi về số điện thoại!');
+        this.successMsg.set(
+          this.translate.instant('FORGOT_PASSWORD.SUCCESS.OTP_SENT')
+        );
         this.step.set(2);
       },
       error: (err: any) => {
-        this.errorMsg.set(err?.error?.message || 'Không gửi được OTP!');
+        const errorMsg =
+          err?.error?.message ||
+          this.translate.instant('FORGOT_PASSWORD.ERRORS.OTP_SEND_FAILED');
+        this.errorMsg.set(errorMsg);
       },
       complete: () => this.isLoading.set(false),
     });
@@ -49,23 +56,28 @@ export class ForgotPasswordComponent {
     this.successMsg.set('');
     if (!form.valid) return;
     if (this.newPassword() !== this.confirmPassword()) {
-      this.errorMsg.set('Mật khẩu xác nhận không khớp!');
+      this.errorMsg.set(
+        this.translate.instant('FORGOT_PASSWORD.ERRORS.PASSWORD_MISMATCH')
+      );
       return;
     }
     this.isLoading.set(true);
-    this.userService
+    this.authService
       .resetPassword(this.phone(), this.otp(), this.newPassword())
       .subscribe({
         next: () => {
           this.successMsg.set(
-            'Đặt lại mật khẩu thành công! Đăng nhập lại nha.'
+            this.translate.instant('FORGOT_PASSWORD.SUCCESS.PASSWORD_RESET')
           );
           this.step.set(3);
         },
         error: (err: any) => {
-          this.errorMsg.set(
-            err?.error?.message || 'OTP hoặc mật khẩu không hợp lệ!'
-          );
+          const errorMsg =
+            err?.error?.message ||
+            this.translate.instant(
+              'FORGOT_PASSWORD.ERRORS.INVALID_OTP_PASSWORD'
+            );
+          this.errorMsg.set(errorMsg);
         },
         complete: () => this.isLoading.set(false),
       });

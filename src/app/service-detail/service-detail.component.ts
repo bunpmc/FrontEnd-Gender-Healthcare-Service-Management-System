@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { FooterComponent } from '../components/footer/footer.component';
 import { HeaderComponent } from '../components/header/header.component';
-import { UserService } from '../Services/user.service';
+import { MedicalService } from '../Services/medical.service';
 import { BreadcrumbsComponent } from '../components/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '../Services/Breadcrumb.service';
 import { ServiceDetail } from '../models/service.model';
@@ -22,7 +22,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   ],
 })
 export class ServiceDetailComponent implements OnInit {
-  private userService = inject(UserService);
+  private medicalService = inject(MedicalService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private breadcrumbService = inject(BreadcrumbService);
@@ -43,8 +43,8 @@ export class ServiceDetailComponent implements OnInit {
       return;
     }
     this.isLoading.set(true);
-    this.userService.getServiceById(this.serviceId).subscribe({
-      next: (data) => {
+    this.medicalService.getServiceById(this.serviceId).subscribe({
+      next: (data: any) => {
         if (!data || typeof data !== 'object' || !data.service_name) {
           this.error.set('Invalid service data!');
           this.isLoading.set(false);

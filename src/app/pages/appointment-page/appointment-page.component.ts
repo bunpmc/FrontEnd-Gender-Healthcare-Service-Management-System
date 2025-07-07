@@ -3,6 +3,9 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { DoctorService } from '../../Services/doctor.service';
+import { MedicalService } from '../../Services/medical.service';
+import { BookingService } from '../../Services/booking.service';
 
 import {
   BookingState,
@@ -30,6 +33,9 @@ export class AppointmentPageComponent implements OnInit {
   // ========== CORE STATE ==========
   private router = inject(Router);
   private translate = inject(TranslateService);
+  private doctorService = inject(DoctorService);
+  private medicalService = inject(MedicalService);
+  private bookingService = inject(BookingService);
   currentStep: number = 0;
   bookingType: 'docfirst' | 'serfirst' | null = null;
   selectedType: 'serfirst' | 'docfirst' | null = null;
@@ -58,13 +64,13 @@ export class AppointmentPageComponent implements OnInit {
 
   // ========== SLOT STATE STEP 4 ==========
   availableDates: string[] = [];
+  allDoctorSlots: DoctorSlotDetail[] = []; // Store all slots from API
   selectedDate: string = '';
 
   // ========== INIT ==========
   ngOnInit(): void {
-    this.doctors = MOCK_DOCTORS;
-    this.services = MOCK_SERVICES;
-    this.availableDoctors = [...MOCK_DOCTORS];
+    this.loadDoctors();
+    this.loadServices();
     this.loadBookingState();
     if (this.booking.phoneRegion) {
       const savedRegion = this.phoneRegions.find(
@@ -72,6 +78,62 @@ export class AppointmentPageComponent implements OnInit {
       );
       if (savedRegion) this.selectedPhoneRegion = savedRegion;
     }
+  }
+
+  // ========== LOAD DATA FROM API ==========
+  private loadDoctors(): void {
+    this.doctorService.fetchDoctorBooking().subscribe({
+      next: (doctors) => {
+        this.doctors = doctors;
+        this.availableDoctors = [...doctors];
+        console.log('Loaded doctors from API:', doctors);
+      },
+      error: (error) => {
+        console.error('Error loading doctors:', error);
+        // Fallback to mock data if API fails
+        this.doctors = MOCK_DOCTORS;
+        this.availableDoctors = [...MOCK_DOCTORS];
+      },
+    });
+  }
+
+  private loadServices(): void {
+    this.medicalService.fetchServiceBooking().subscribe({
+      next: (apiServices: any[]) => {
+        // Map API response to ServiceBooking format
+        this.services = apiServices.map((service) => ({
+          service_id: service.service_id,
+          name: service.service_name, // Map service_name to name
+          description: service.description || '',
+        }));
+        console.log(
+          'Loaded services from fetch-serviceBooking API:',
+          this.services
+        );
+      },
+      error: (error) => {
+        console.error(
+          'Error loading services from fetch-serviceBooking:',
+          error
+        );
+        // Fallback to old API endpoint
+        this.medicalService.fetchService().subscribe({
+          next: (fallbackServices) => {
+            this.services = fallbackServices;
+            console.log('Loaded services from fallback API:', fallbackServices);
+          },
+          error: (fallbackError) => {
+            console.error(
+              'Error loading services from fallback API:',
+              fallbackError
+            );
+            // Final fallback to mock data
+            this.services = MOCK_SERVICES;
+            console.log('Using mock services data');
+          },
+        });
+      },
+    });
   }
   get progressWidth(): string {
     // Tổng số bước thực hiện là 5 (step 0 ~ 4, có thể tùy thực tế của bạn)
@@ -121,7 +183,9 @@ export class AppointmentPageComponent implements OnInit {
     this.formSubmitted = true;
     this.errorMessage = null;
     if (!this.booking.service_id) {
-      this.errorMessage = 'Please select a service to continue.';
+      this.errorMessage = this.translate.instant(
+        'APPOINTMENT.ERRORS.SERVICE_REQUIRED'
+      );
       return;
     }
     this.goToNextStep();
@@ -130,7 +194,9 @@ export class AppointmentPageComponent implements OnInit {
     this.formSubmitted = true;
     this.errorMessage = null;
     if (!this.booking.doctor_id) {
-      this.errorMessage = 'Please select a doctor.';
+      this.errorMessage = this.translate.instant(
+        'APPOINTMENT.ERRORS.DOCTOR_REQUIRED'
+      );
       return;
     }
     this.goToNextStep();
@@ -160,16 +226,75 @@ export class AppointmentPageComponent implements OnInit {
 
   // ========== STEP 4: SLOT LOGIC ==========
   initSlotStep() {
-    // Chỉ lấy slot đúng doctor đang chọn
-    const allSlots = MOCK_DOCTOR_SLOTS.filter(
-      (slot) => slot.doctor_id === this.booking.doctor_id && slot.is_active
-    );
-    this.availableDates = Array.from(new Set(allSlots.map((s) => s.slot_date)));
-    this.availableDates.sort();
-    this.selectedDate = this.availableDates.includes(this.selectedDate)
-      ? this.selectedDate
-      : this.availableDates[0] || '';
-    this.updateSlotsForDate();
+    if (!this.booking.doctor_id) {
+      console.error('No doctor selected for slot loading');
+      return;
+    }
+
+    // Load slots from API instead of mock data
+    this.loadDoctorSlots(this.booking.doctor_id);
+  }
+
+  private loadDoctorSlots(doctor_id: string): void {
+    this.bookingService.fetchSlotsByDoctorId(doctor_id).subscribe({
+      next: (response: any) => {
+        if (response && response.slots) {
+          // Map API response to DoctorSlotDetail format
+          const apiSlots = response.slots.map((slot: any) => ({
+            doctor_slot_id: slot.doctor_slot_id,
+            doctor_id: response.doctor_id,
+            slot_id: slot.slot_id,
+            slot_date: slot.slot_date,
+            slot_time: slot.slot_time,
+            is_active: slot.is_active,
+            appointments_count: slot.appointments_count,
+            max_appointments: slot.max_appointments,
+          }));
+
+          // Filter only active slots
+          const activeSlots = apiSlots.filter((slot: any) => slot.is_active);
+
+          // Extract unique dates and sort them
+          this.availableDates = Array.from(
+            new Set(activeSlots.map((s: any) => s.slot_date))
+          );
+          this.availableDates.sort();
+
+          // Set selected date
+          this.selectedDate = this.availableDates.includes(this.selectedDate)
+            ? this.selectedDate
+            : this.availableDates[0] || '';
+
+          // Store all slots for later use
+          this.allDoctorSlots = activeSlots;
+
+          // Update slots for selected date
+          this.updateSlotsForDate();
+
+          console.log('Loaded doctor slots from API:', activeSlots);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading doctor slots:', error);
+        // Fallback to mock data
+        const allSlots = MOCK_DOCTOR_SLOTS.filter(
+          (slot) => slot.doctor_id === this.booking.doctor_id && slot.is_active
+        );
+        this.availableDates = Array.from(
+          new Set(allSlots.map((s) => s.slot_date))
+        );
+        this.availableDates.sort();
+        this.selectedDate = this.availableDates.includes(this.selectedDate)
+          ? this.selectedDate
+          : this.availableDates[0] || '';
+        this.updateSlotsForDate();
+        console.log('Using mock slots data due to API error');
+      },
+    });
+
+    // Reset booking slot selection
+    this.booking.preferred_slot_id = undefined;
+    this.booking.preferred_time = undefined;
   }
   onDateChange(date: string) {
     this.selectedDate = date;
@@ -178,11 +303,24 @@ export class AppointmentPageComponent implements OnInit {
     this.booking.preferred_time = undefined;
   }
   updateSlotsForDate() {
-    this.slotsForSelectedDate = MOCK_DOCTOR_SLOTS.filter(
-      (slot) =>
-        slot.doctor_id === this.booking.doctor_id &&
-        slot.slot_date === this.selectedDate
-    ).sort((a, b) => a.slot_time.localeCompare(b.slot_time));
+    // Filter slots for selected date from already loaded slots
+    if (this.allDoctorSlots && this.allDoctorSlots.length > 0) {
+      this.slotsForSelectedDate = this.allDoctorSlots
+        .filter(
+          (slot: any) =>
+            slot.doctor_id === this.booking.doctor_id &&
+            slot.slot_date === this.selectedDate &&
+            slot.is_active
+        )
+        .sort((a: any, b: any) => a.slot_time.localeCompare(b.slot_time));
+    } else {
+      // Fallback to mock data if no API data available
+      this.slotsForSelectedDate = MOCK_DOCTOR_SLOTS.filter(
+        (slot) =>
+          slot.doctor_id === this.booking.doctor_id &&
+          slot.slot_date === this.selectedDate
+      ).sort((a, b) => a.slot_time.localeCompare(b.slot_time));
+    }
   }
   selectSlot(slot: DoctorSlotDetail) {
     if (slot.is_active && slot.appointments_count < slot.max_appointments) {
@@ -195,7 +333,9 @@ export class AppointmentPageComponent implements OnInit {
   onContinueSlot() {
     this.formSubmitted = true;
     if (!this.booking.preferred_slot_id) {
-      this.errorMessage = 'Please select a time slot to continue.';
+      this.errorMessage = this.translate.instant(
+        'APPOINTMENT.ERRORS.SLOT_REQUIRED'
+      );
       return;
     }
     this.goToNextStep();
@@ -596,9 +736,10 @@ export class AppointmentPageComponent implements OnInit {
   goHome(event: Event): void {
     event.preventDefault();
     if (this.hasBookingData()) {
-      const confirmLeave = window.confirm(
-        'Are you sure you want to leave the booking page? All data will be lost!'
+      const confirmMessage = this.translate.instant(
+        'APPOINTMENT.CONFIRM_LEAVE'
       );
+      const confirmLeave = window.confirm(confirmMessage);
       if (confirmLeave) {
         this.resetForm();
         this.router.navigate(['/']);
@@ -606,5 +747,48 @@ export class AppointmentPageComponent implements OnInit {
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  // ========== SUBMIT BOOKING ==========
+  submitBooking(): void {
+    if (!this.booking.doctor_id || !this.booking.preferred_slot_id) {
+      const errorMessage = this.translate.instant(
+        'APPOINTMENT.ERRORS.INCOMPLETE_INFO'
+      );
+      alert(errorMessage);
+      return;
+    }
+
+    const bookingPayload = {
+      doctor_id: this.booking.doctor_id,
+      service_id: this.booking.service_id,
+      slot_id: this.booking.preferred_slot_id,
+      patient_name: this.booking.fullName,
+      patient_phone: this.booking.phone,
+      patient_email: this.booking.email,
+      notes: this.booking.message,
+    };
+
+    this.bookingService.bookAppointment(bookingPayload).subscribe({
+      next: (response) => {
+        const successMessage = this.translate.instant(
+          'APPOINTMENT.SUCCESS.BOOKING_CREATED'
+        );
+        alert(successMessage);
+        console.log('Booking successful:', response);
+        this.resetForm();
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Booking error:', error);
+        const errorPrefix = this.translate.instant(
+          'APPOINTMENT.ERRORS.BOOKING_FAILED'
+        );
+        const retryMessage = this.translate.instant(
+          'APPOINTMENT.ERRORS.PLEASE_RETRY'
+        );
+        alert(errorPrefix + ': ' + (error.message || retryMessage));
+      },
+    });
   }
 }
