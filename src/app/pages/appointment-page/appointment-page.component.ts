@@ -3,9 +3,9 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DoctorService } from '../../Services/doctor.service';
-import { MedicalService } from '../../Services/medical.service';
-import { BookingService } from '../../Services/booking.service';
+import { DoctorService } from '../../services/doctor.service';
+import { MedicalService } from '../../services/medical.service';
+import { BookingService } from '../../services/booking.service';
 
 import {
   BookingState,

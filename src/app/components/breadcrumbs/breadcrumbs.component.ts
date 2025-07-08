@@ -7,7 +7,7 @@ import {
 } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { BreadcrumbService } from '../../Services/Breadcrumb.service';
+import { BreadcrumbService } from '../../services/Breadcrumb.service';
 
 interface Breadcrumb {
   label: string;

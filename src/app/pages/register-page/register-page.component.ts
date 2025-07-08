@@ -9,8 +9,8 @@ import {
 import { FormsModule, NgForm } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { GoogleComponent } from '../../components/google/google.component';
-import { AuthService } from '../../Services/auth.service';
-import { TokenService } from '../../Services/token.service';
+import { AuthService } from '../../services/auth.service';
+import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -19,8 +19,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   selector: 'app-register',
   standalone: true,
   imports: [FormsModule, GoogleComponent, TranslateModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.css',
+  templateUrl: './register-page.component.html',
+  styleUrl: './register-page.component.css',
 })
 export class RegisterComponent {
   // ==================== STATE / PROPERTY ====================

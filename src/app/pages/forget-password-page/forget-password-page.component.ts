@@ -1,5 +1,5 @@
 import { Component, inject, signal, Output, EventEmitter } from '@angular/core';
-import { AuthService } from '../../Services/auth.service';
+import { AuthService } from '../../services/auth.service';
 import { NgForm, FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -7,8 +7,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   selector: 'app-forgot-password',
   standalone: true,
   imports: [FormsModule, TranslateModule],
-  templateUrl: './forget-password.component.html',
-  styleUrl: './forget-password.component.css',
+  templateUrl: './forget-password-page.component.html',
+  styleUrl: './forget-password-page.component.css',
 })
 export class ForgotPasswordComponent {
   @Output() close = new EventEmitter<void>();

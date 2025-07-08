@@ -52,30 +52,14 @@
 
   <!-- 3. AI Support Chat Button -->
   <div class="action-item">
-    <button
-      (click)="toggleChat()"
-      class="action-btn chat-btn"
-      [title]="'AI_CHAT.TITLE' | translate"
-    >
-      <!-- Headset Icon from Flaticon -->
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/2706/2706962.png"
-        alt="AI Support"
-        class="action-icon headset-icon"
-      />
-      <div class="ripple-effect"></div>
-
-      <!-- Unread count badge -->
-      @if (unreadCount > 0) {
-      <div class="unread-badge">{{ unreadCount }}</div>
-      }
-    </button>
-
+    <!-- Headset Icon from Flaticon -->
+    <div class="ripple-effect"></div>
+    <app-support-chat />
     <!-- Hover tooltip -->
-    <div class="tooltip">
+    <!-- <div class="tooltip">
       <span class="tooltip-text">{{ "AI_CHAT.TITLE" | translate }}</span>
       <span class="tooltip-number">{{ "AI_CHAT.SUBTITLE" | translate }}</span>
-    </div>
+    </div> -->
   </div>
 
   <!-- 4. Back to Top Button -->

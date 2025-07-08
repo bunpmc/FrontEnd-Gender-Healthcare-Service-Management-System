@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { SupportChatComponent } from '../support-chat/support-chat.component';
 import {
   ChatMessage,
   ChatRequest,
@@ -25,7 +26,7 @@ import {
 @Component({
   selector: 'app-floating-actions',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, SupportChatComponent],
   templateUrl: './floating-actions.component.html',
   styleUrl: './floating-actions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
