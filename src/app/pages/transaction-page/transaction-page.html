@@ -1,9 +1,9 @@
 <app-header />
 <body class="bg-white">
   <!-- ======= BREADCRUMBS ======= -->
-  <div class="max-w-7xl mx-auto px-6 pt-7 text-[#4E6688]">
+  <!-- <div class="max-w-7xl mx-auto px-6 pt-7 text-[#4E6688]">
     <app-breadcrumbs />
-  </div>
+  </div> -->
 
   <div class="transaction-container">
     <div class="transaction-header">
@@ -12,7 +12,7 @@
         Thanh toán dịch vụ
       </h1>
       <p class="page-subtitle">
-        Hoàn tất thanh toán để sử dụng dịch vụ chăm sóc sức khỏe giới tính
+        Hoàn tất thanh toán để sử dụng dịch vụ chăm sóc sức khỏe giới tính.
       </p>
     </div>
 
@@ -68,7 +68,7 @@
               [(ngModel)]="customerInfo.fullName"
               name="fullName"
               class="form-control"
-              placeholder="Nhập họ và tên đầy đủ"
+              placeholder="Nhập họ và tên đầy đủ."
               required
             />
           </div>
@@ -81,7 +81,7 @@
               [(ngModel)]="customerInfo.email"
               name="email"
               class="form-control"
-              placeholder="Nhập địa chỉ email"
+              placeholder="Nhập địa chỉ email."
               required
             />
           </div>
@@ -94,7 +94,7 @@
               [(ngModel)]="customerInfo.phone"
               name="phone"
               class="form-control"
-              placeholder="Nhập số điện thoại"
+              placeholder="Nhập số điện thoại."
               required
             />
           </div>
@@ -107,7 +107,7 @@
               name="address"
               class="form-control"
               rows="3"
-              placeholder="Nhập địa chỉ (tùy chọn)"
+              placeholder="Nhập địa chỉ (tùy chọn)."
             ></textarea>
           </div>
 
@@ -124,16 +124,12 @@
               Phương thức thanh toán
             </h3>
             <div class="vnpay-info">
-              <img
-                src="/assets/images/vnpay-logo.png"
-                alt="VNPay"
-                class="vnpay-logo"
-              />
+              <img src="./vnpay-logo.jpg" alt="VNPay" class="vnpay-logo" />
               <div class="vnpay-description">
                 <h4>VNPay</h4>
                 <p>
                   Thanh toán an toàn qua cổng thanh toán VNPay với các ngân hàng
-                  trong nước
+                  trong nước.
                 </p>
               </div>
             </div>
