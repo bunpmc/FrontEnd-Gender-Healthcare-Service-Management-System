@@ -1,19 +1,22 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { LoginComponent } from './pages/login/login.component';
-import { RegisterComponent } from './pages/register/register.component';
+import { LoginComponent } from './pages/login-page/login-page.component';
+import { RegisterComponent } from './pages/register-page/register-page.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { AppointmentPageComponent } from './pages/appointment-page/appointment-page.component';
 import { DoctorsPageComponent } from './pages/doctors-page/doctors-page.component';
 import { BlogsPageComponent } from './pages/blogs-page/blogs-page.component';
-import { DoctorDetailComponent } from './pages/doctor-detail/doctor-detail.component';
-import { BlogDetailComponent } from './pages/blog-detail/blog-detail.component';
-import { ForgotPasswordComponent } from './pages/forget-password/forget-password.component';
+import { DoctorDetailComponent } from './pages/doctor-detail-page/doctor-detail-page.component';
+import { BlogDetailComponent } from './pages/blog-detail-page/blog-detail-page.component';
+import { ForgotPasswordComponent } from './pages/forget-password-page/forget-password-page.component';
 import { ServicePageComponent } from './pages/services-page/services-page.component';
 import { ConsultationPageComponent } from './pages/consultation-page/consultation-page.component';
 import { LeaveAppointmentGuard } from './guards/leave-appointment.guard';
-import { ServiceDetailComponent } from './service-detail/service-detail.component';
+import { ServiceDetailComponent } from './pages/service-detail-page/service-detail-page.component';
+import { Transaction } from './pages/transaction-page/transaction-page';
+import { CartComponent } from './components/cart/cart.component';
+import { PaymentResultComponent } from './pages/payment-result-page/payment-result-page.component';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent, data: { breadcrumb: 'Home' } },
@@ -66,6 +69,21 @@ export const routes: Routes = [
     path: 'service/:id',
     component: ServiceDetailComponent,
     data: { breadcrumb: '...' },
+  },
+  {
+    path: 'cart',
+    component: CartComponent,
+    data: { breadcrumb: 'Cart' },
+  },
+  {
+    path: 'transaction',
+    component: Transaction,
+    data: { breadcrumb: 'Transaction' },
+  },
+  {
+    path: 'payment-result',
+    component: PaymentResultComponent,
+    data: { breadcrumb: 'Payment Result' },
   },
 ];
 

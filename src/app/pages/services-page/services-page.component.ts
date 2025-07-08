@@ -2,8 +2,10 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { MedicalService as MedicalServiceAPI } from '../../Services/medical.service';
+import { MedicalService as MedicalServiceAPI } from '../../services/medical.service';
+import { CartService } from '../../services/cart.service';
 import { MedicalService } from '../../models/service.model';
+import { CartItem } from '../../models/payment.model';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
@@ -25,6 +27,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class ServicePageComponent implements OnInit {
   private medicalService = inject(MedicalServiceAPI);
+  private cartService = inject(CartService);
   private translate = inject(TranslateService);
 
   categories = signal<string[]>([]);
@@ -130,5 +133,36 @@ export class ServicePageComponent implements OnInit {
     const messageTemplate = this.translate.instant('SERVICES.INQUIRY_MESSAGE');
     const message = `${messageTemplate} ${service.name}`;
     localStorage.setItem('Remember-contact-form', JSON.stringify({ message }));
+  }
+
+  // Add service to cart
+  addToCart(service: MedicalService, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const cartItem: CartItem = {
+      service_id: service.id,
+      service_name: service.name,
+      price: service.price,
+      quantity: 1,
+      image_link: service.image_link || undefined,
+      description: service.excerpt || undefined,
+    };
+
+    this.cartService.addToCart(cartItem);
+
+    // Show success message (you can implement a toast service for better UX)
+    alert(`${service.name} đã được thêm vào giỏ hàng!`);
+  }
+
+  // Check if service is in cart
+  isInCart(serviceId: string): boolean {
+    return this.cartService.isInCart(serviceId);
+  }
+
+  // Get cart item count for a specific service
+  getCartQuantity(serviceId: string): number {
+    const cartItem = this.cartService.getCartItem(serviceId);
+    return cartItem ? cartItem.quantity : 0;
   }
 }

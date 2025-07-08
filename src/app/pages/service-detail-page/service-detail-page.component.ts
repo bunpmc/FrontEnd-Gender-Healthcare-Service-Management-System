@@ -1,19 +1,19 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { FooterComponent } from '../components/footer/footer.component';
-import { HeaderComponent } from '../components/header/header.component';
-import { MedicalService } from '../Services/medical.service';
-import { BreadcrumbsComponent } from '../components/breadcrumbs/breadcrumbs.component';
-import { BreadcrumbService } from '../Services/Breadcrumb.service';
-import { ServiceDetail } from '../models/service.model';
+import { FooterComponent } from '../../components/footer/footer.component';
+import { HeaderComponent } from '../../components/header/header.component';
+import { MedicalService } from '../../services/medical.service';
+import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
+import { BreadcrumbService } from '../../services/Breadcrumb.service';
+import { ServiceDetail } from '../../models/service.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  templateUrl: './service-detail.component.html',
-  styleUrl: './service-detail.component.css',
+  templateUrl: './service-detail-page.component.html',
+  styleUrl: './service-detail-page.component.css',
   imports: [
     FooterComponent,
     HeaderComponent,

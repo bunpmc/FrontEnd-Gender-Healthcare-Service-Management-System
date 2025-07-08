@@ -11,8 +11,8 @@ import {
 import { FormsModule, NgForm } from '@angular/forms';
 import { GoogleComponent } from '../../components/google/google.component';
 import { debounceTime } from 'rxjs';
-import { AuthService } from '../../Services/auth.service';
-import { TokenService } from '../../Services/token.service';
+import { AuthService } from '../../services/auth.service';
+import { TokenService } from '../../services/token.service';
 import { type UserLogin } from '../../models/user.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -21,8 +21,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   selector: 'app-login',
   standalone: true,
   imports: [FormsModule, GoogleComponent, TranslateModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+  templateUrl: './login-page.component.html',
+  styleUrl: './login-page.component.css',
 })
 export class LoginComponent {
   // ==================== STATE / PROPERTY ====================

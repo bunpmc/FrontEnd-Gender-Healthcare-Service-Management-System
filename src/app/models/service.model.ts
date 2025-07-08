@@ -32,5 +32,6 @@ export interface ServiceDetail {
     how: string;
   };
   price: number;
+  duration: number;
   image_link: string;
 }

@@ -100,7 +100,7 @@ export class AuthService {
     });
 
     // Call REST API endpoint cho user profile
-    return this.http.get(`${environment.apiEndpoint}/user-profile`, {
+    return this.http.get(`${environment.apiEndpoint}/me`, {
       headers,
     });
   }
