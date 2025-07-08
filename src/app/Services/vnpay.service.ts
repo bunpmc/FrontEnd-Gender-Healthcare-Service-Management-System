@@ -2,20 +2,22 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { 
-  VNPayPaymentRequest, 
-  VNPayPaymentResponse, 
-  VNPayCallbackData, 
+import {
+  VNPayPaymentRequest,
+  VNPayPaymentResponse,
+  VNPayCallbackData,
   PaymentTransaction,
-  PaymentResult 
+  PaymentResult,
 } from '../models/payment.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VnpayService {
-  private readonly vnpayPaymentUrl = `${environment.apiEndpoint}/vnpay-payment`;
-  private readonly vnpayCallbackUrl = `${environment.apiEndpoint}/vnpay-callback`;
+  private readonly vnpayPaymentUrl =
+    'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/vnpay-payment';
+  private readonly vnpayCallbackUrl =
+    'https://xzxxodxplyetecrsbxmc.supabase.co/functions/v1/vnpay-callback';
 
   constructor(private http: HttpClient) {}
 
@@ -23,37 +25,30 @@ export class VnpayService {
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${environment.authorization}`
     });
   }
 
   // Create VNPay payment URL
-  createPayment(paymentRequest: VNPayPaymentRequest): Observable<VNPayPaymentResponse> {
+  createPayment(
+    paymentRequest: VNPayPaymentRequest
+  ): Observable<VNPayPaymentResponse> {
     const payload = {
       amount: paymentRequest.amount,
       orderInfo: paymentRequest.orderInfo,
-      orderType: paymentRequest.orderType || 'healthcare',
-      returnUrl: paymentRequest.returnUrl,
-      ipAddr: paymentRequest.ipAddr || this.getClientIP(),
-      locale: paymentRequest.locale || 'vn',
-      currCode: paymentRequest.currCode || 'VND',
-      bankCode: paymentRequest.bankCode || ''
+      patientId: paymentRequest.patientId,
+      services: paymentRequest.services,
     };
 
-    return this.http.post<VNPayPaymentResponse>(
-      this.vnpayPaymentUrl,
-      payload,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<VNPayPaymentResponse>(this.vnpayPaymentUrl, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
   // Verify VNPay callback
   verifyCallback(callbackData: VNPayCallbackData): Observable<PaymentResult> {
-    return this.http.post<PaymentResult>(
-      this.vnpayCallbackUrl,
-      callbackData,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<PaymentResult>(this.vnpayCallbackUrl, callbackData, {
+      headers: this.getHeaders(),
+    });
   }
 
   // Save transaction to database
@@ -104,7 +99,7 @@ export class VnpayService {
   parseCallbackParams(url: string): VNPayCallbackData | null {
     try {
       const urlParams = new URLSearchParams(url.split('?')[1]);
-      
+
       return {
         vnp_Amount: urlParams.get('vnp_Amount') || '',
         vnp_BankCode: urlParams.get('vnp_BankCode') || '',
@@ -117,7 +112,7 @@ export class VnpayService {
         vnp_TransactionNo: urlParams.get('vnp_TransactionNo') || '',
         vnp_TransactionStatus: urlParams.get('vnp_TransactionStatus') || '',
         vnp_TxnRef: urlParams.get('vnp_TxnRef') || '',
-        vnp_SecureHash: urlParams.get('vnp_SecureHash') || ''
+        vnp_SecureHash: urlParams.get('vnp_SecureHash') || '',
       };
     } catch (error) {
       console.error('Error parsing VNPay callback parameters:', error);
@@ -144,9 +139,12 @@ export class VnpayService {
       '51': 'Giao dịch không thành công do: Tài khoản của quý khách không đủ số dư để thực hiện giao dịch.',
       '65': 'Giao dịch không thành công do: Tài khoản của Quý khách đã vượt quá hạn mức giao dịch trong ngày.',
       '75': 'Ngân hàng thanh toán đang bảo trì.',
-      '79': 'Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định.'
+      '79': 'Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định.',
     };
 
-    return statusMessages[responseCode] || 'Giao dịch không thành công do lỗi không xác định.';
+    return (
+      statusMessages[responseCode] ||
+      'Giao dịch không thành công do lỗi không xác định.'
+    );
   }
 }

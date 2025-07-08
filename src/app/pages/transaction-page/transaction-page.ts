@@ -7,7 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
+// import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
 import { CartService } from '../../services/cart.service';
 import { VnpayService } from '../../services/vnpay.service';
 import {
@@ -24,7 +24,7 @@ import {
     TranslateModule,
     HeaderComponent,
     FooterComponent,
-    BreadcrumbsComponent,
+    // BreadcrumbsComponent,
   ],
   templateUrl: './transaction-page.html',
   styleUrl: './transaction-page.css',
@@ -51,12 +51,14 @@ export class Transaction implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe((cart) => {
-      this.cart = cart;
-      if (cart.items.length === 0) {
-        this.router.navigate(['/service']);
-      }
-    });
+    this.cartService.cart$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((cart: Cart) => {
+        this.cart = cart;
+        if (cart.items.length === 0) {
+          this.router.navigate(['/service']);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -74,10 +76,10 @@ export class Transaction implements OnInit, OnDestroy {
     this.errorMessage = '';
 
     const paymentRequest: VNPayPaymentRequest = {
-      amount: this.vnpayService.formatAmountForVNPay(this.cart.total),
+      amount: this.cart.total,
       orderInfo: this.cartService.generateOrderInfo(),
-      orderType: 'healthcare',
-      returnUrl: this.vnpayService.generateReturnUrl(),
+      patientId: this.customerInfo.email, // Using email as patient ID
+      services: this.cart.items,
     };
 
     this.vnpayService
@@ -85,14 +87,14 @@ export class Transaction implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          if (response.success && response.paymentUrl) {
+          if (response.success && response.data?.paymentUrl) {
             // Save transaction before redirecting
-            this.saveTransaction();
+            this.saveTransaction(response.data.orderId);
             // Redirect to VNPay
-            window.location.href = response.paymentUrl;
+            window.location.href = response.data.paymentUrl;
           } else {
             this.errorMessage =
-              response.message || 'Không thể tạo liên kết thanh toán';
+              response.error || 'Không thể tạo liên kết thanh toán';
             this.isProcessing = false;
           }
         },
@@ -123,8 +125,9 @@ export class Transaction implements OnInit, OnDestroy {
   }
 
   // Save transaction
-  private saveTransaction(): void {
+  private saveTransaction(orderId: string): void {
     const transaction: PaymentTransaction = {
+      transaction_id: orderId,
       cart_items: this.cart.items,
       total_amount: this.cart.total,
       payment_method: 'vnpay',

@@ -19,18 +19,23 @@ export interface Cart {
 export interface VNPayPaymentRequest {
   amount: number;
   orderInfo: string;
-  orderType: string;
-  returnUrl: string;
-  ipAddr?: string;
-  locale?: string;
-  currCode?: string;
-  bankCode?: string;
+  patientId?: string;
+  services?: CartItem[];
 }
 
 export interface VNPayPaymentResponse {
   success: boolean;
-  paymentUrl?: string;
-  message?: string;
+  data?: {
+    orderId: string;
+    paymentUrl: string;
+    amount: number;
+    amountInCents: number;
+    orderInfo: string;
+    createDate: string;
+    expireDate: string;
+    expiresIn: string;
+    currency: string;
+  };
   error?: string;
 }
 

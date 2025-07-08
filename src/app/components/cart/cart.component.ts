@@ -22,9 +22,11 @@ export class CartComponent implements OnInit, OnDestroy {
   constructor(private cartService: CartService) {}
 
   ngOnInit(): void {
-    this.cartService.cart$.pipe(takeUntil(this.destroy$)).subscribe((cart) => {
-      this.cart = cart;
-    });
+    this.cartService.cart$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((cart: Cart) => {
+        this.cart = cart;
+      });
   }
 
   ngOnDestroy(): void {

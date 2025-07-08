@@ -149,6 +149,7 @@ export class CartService {
   generateOrderInfo(): string {
     const cart = this.getCurrentCart();
     const serviceNames = cart.items.map(item => item.service_name).join(', ');
-    return `Healthcare Services: ${serviceNames}`;
+    const orderNumber = Date.now().toString().slice(-6);
+    return `Payment for Order #${orderNumber}: ${serviceNames}`;
   }
 }
