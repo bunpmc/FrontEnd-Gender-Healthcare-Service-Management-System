@@ -7,7 +7,7 @@ import { takeUntil, finalize } from 'rxjs/operators';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../test/auth.service';
 import { DashboardPatient, Patient } from '../../models/patient.model';
 import { DashboardAppointment, CalendarDay, DashboardState } from '../../models/appointment.model';
 

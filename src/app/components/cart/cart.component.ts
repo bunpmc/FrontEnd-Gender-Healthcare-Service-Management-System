@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { CartService } from '../../services/cart.service';
+import { CartService } from '../../test/cart.service';
 import { Cart, CartItem } from '../../models/payment.model';
 
 @Component({

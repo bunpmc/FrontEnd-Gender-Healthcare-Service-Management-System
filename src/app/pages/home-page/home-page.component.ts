@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core'; // <-- Thêm dòng này!
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { SplideComponent } from '../../components/splide/splide.component';
-import { BlogService } from '../../services/blog.service';
+import { BlogService } from '../../test/blog.service';
 import { Blog, BlogDisplay } from '../../models/blog.model';
 
 @Component({

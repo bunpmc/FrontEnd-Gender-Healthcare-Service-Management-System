@@ -11,7 +11,7 @@ import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 import Splide from '@splidejs/splide';
 import { Doctor } from '../../models/doctor.model';
-import { DoctorService } from '../../services/doctor.service';
+import { DoctorService } from '../../test/doctor.service';
 
 @Component({
   selector: 'app-splide',

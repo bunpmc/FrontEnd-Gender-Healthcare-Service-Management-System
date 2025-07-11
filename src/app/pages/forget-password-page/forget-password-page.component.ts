@@ -1,5 +1,5 @@
 import { Component, inject, signal, Output, EventEmitter } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../test/auth.service';
 import { NgForm, FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 

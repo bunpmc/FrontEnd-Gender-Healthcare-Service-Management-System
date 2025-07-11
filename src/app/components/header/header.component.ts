@@ -9,10 +9,10 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
-import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../test/auth.service';
+import { CartService } from '../../test/cart.service';
 import { TranslateService, TranslateModule } from '@ngx-translate/core'; // THÊM
-import { TokenService } from '../../services/token.service';
+import { TokenService } from '../../test/token.service';
 import { Cart } from '../../models/payment.model';
 
 @Component({
