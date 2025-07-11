@@ -45,10 +45,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dashboard = {
     name: '',
     bio: '',
-    pronouns: '',
-    location: '',
-    website: '',
-    socialLinks: ['', '', '', ''],
     phone: '',
     email: '',
     dateOfBirth: '',
@@ -130,10 +126,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.dashboard = {
         name: currentPatient.full_name || '',
         bio: currentPatient.bio || '',
-        pronouns: '', // Not in patient model, keep empty
-        location: '', // Not in patient model, keep empty
-        website: '', // Not in patient model, keep empty
-        socialLinks: ['', '', '', ''], // Not in patient model, keep empty
         phone: currentPatient.phone || '',
         email: currentPatient.email || '',
         dateOfBirth: currentPatient.date_of_birth || '',
