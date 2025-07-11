@@ -8,8 +8,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
-import { CartService } from '../../test/cart.service';
-import { VnpayService } from '../../test/vnpay.service';
+import { CartService } from '../../services/cart.service';
+import { VnpayService } from '../../services/vnpay.service';
 import {
   Cart,
   VNPayPaymentRequest,

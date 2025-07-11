@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { VnpayService } from '../../test/vnpay.service';
-import { CartService } from '../../test/cart.service';
+import { VnpayService } from '../../services/vnpay.service';
+import { CartService } from '../../services/cart.service';
 import { VNPayCallbackData, PaymentResult } from '../../models/payment.model';
 
 @Component({

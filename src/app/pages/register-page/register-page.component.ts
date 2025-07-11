@@ -9,8 +9,8 @@ import {
 import { FormsModule, NgForm } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { GoogleComponent } from '../../components/google/google.component';
-import { AuthService } from '../../test/auth.service';
-import { TokenService } from '../../test/token.service';
+import { AuthService } from '../../services/auth.service';
+import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 

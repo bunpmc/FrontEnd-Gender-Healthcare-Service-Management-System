@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DoctorDetail } from '../../models/doctor.model';
-import { DoctorService } from '../../test/doctor.service';
+import { DoctorService } from '../../services/doctor.service';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
-import { BreadcrumbService } from '../../test/breadcrumb.service';
+import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 

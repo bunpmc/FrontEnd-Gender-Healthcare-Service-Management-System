@@ -1,12 +1,12 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { BlogService } from '../../test/blog.service';
+import { BlogService } from '../../services/blog.service';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { BlogDetail } from '../../models/blog.model';
 import { BreadcrumbsComponent } from '../../components/breadcrumbs/breadcrumbs.component';
-import { BreadcrumbService } from '../../test/breadcrumb.service';
+import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({

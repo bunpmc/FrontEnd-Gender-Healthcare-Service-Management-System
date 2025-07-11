@@ -2,8 +2,8 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { MedicalService as MedicalServiceAPI } from '../../test/medical.service';
-import { CartService } from '../../test/cart.service';
+import { MedicalService as MedicalServiceAPI } from '../../services/medical.service';
+import { CartService } from '../../services/cart.service';
 import { MedicalService } from '../../models/service.model';
 import { CartItem } from '../../models/payment.model';
 import { NgClass } from '@angular/common';

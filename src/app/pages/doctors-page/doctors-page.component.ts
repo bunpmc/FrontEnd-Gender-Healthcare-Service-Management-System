@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Doctor } from '../../models/doctor.model';
-import { DoctorService } from '../../test/doctor.service';
+import { DoctorService } from '../../services/doctor.service';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
